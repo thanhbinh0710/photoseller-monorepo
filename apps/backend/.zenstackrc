@@ -1,0 +1,2 @@
+# ZenStack configuration
+output = "./node_modules/.zenstack"

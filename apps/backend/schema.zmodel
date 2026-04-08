@@ -1,0 +1,195 @@
+// ZenStack Schema for PhotoSeller Platform
+// Multi-user schema: Admin (seller) and Users (customers)
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+// User model - Admin (seller) and Users (customers)
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String   @password @omit
+  firstName String
+  lastName  String
+  role      UserRole @default(USER)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  orders     Order[]
+  telephones Telephone[] // Max 3 per user (enforced in application logic)
+  addresses  Address[]   // Max 3 per user (enforced in application logic)
+  
+  // Access control
+  @@allow('create', true) // Anyone can register
+  @@allow('read', auth() == this || auth().role == ADMIN) // Users can read own data, admins can read all
+  @@allow('update', auth() == this) // Users can update their own data
+  @@allow('delete', auth().role == ADMIN) // Only admins can delete
+}
+
+// Telephone model - Users can have up to 3 phone numbers
+model Telephone {
+  id          Int      @id @default(autoincrement())
+  phoneNumber String
+  isPrimary   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      Int
+
+  // Access control
+  @@allow('create,read,update,delete', auth() == user || auth().role == ADMIN)
+}
+
+// Address model - Users can have up to 3 addresses
+model Address {
+  id          Int      @id @default(autoincrement())
+  label       String?  // e.g., "Home", "Office"
+  street      String
+  city        String
+  state       String?
+  postalCode  String
+  country     String   @default("Vietnam")
+  isPrimary   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      Int
+
+  // Access control
+  @@allow('create,read,update,delete', auth() == user || auth().role == ADMIN)
+}
+
+// Photo categories (Botanical, Still-Life, Portrait)
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  photos    Photo[]
+
+  // Access control
+  @@allow('read', true) // Anyone can read categories
+  @@allow('create,update,delete', auth().role == ADMIN) // Only admin can manage
+}
+
+// Photo sizes (A4, A3, A2, A1)
+model Size {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique  // e.g., "A4", "A3"
+  dimensions  String             // e.g., "21×29.7cm"
+  widthCm     Decimal  @db.Decimal(5, 1)
+  heightCm    Decimal  @db.Decimal(5, 1)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  photos      Photo[]
+
+  // Access control
+  @@allow('read', true) // Anyone can read sizes
+  @@allow('create,update,delete', auth().role == ADMIN) // Only admin can manage
+}
+
+// Simplified Photo model
+model Photo {
+  id          Int      @id @default(autoincrement())
+  name        String
+  slug        String   @unique
+  imageUrl    String
+  stock       Int      @default(0)
+  price       Decimal  @db.Decimal(10, 2)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  categoryId  Int
+  size        Size     @relation(fields: [sizeId], references: [id], onDelete: Restrict)
+  sizeId      Int
+  orderItems  OrderItem[]
+
+  // Access control
+  @@allow('read', isActive) // Everyone can see active photos
+  @@allow('create,update,delete', auth().role == ADMIN) // Only admin can manage
+}
+
+// Simplified Order model (digital + optional shipping)
+model Order {
+  id              Int         @id @default(autoincrement())
+  orderNumber     String      @unique @default(cuid())
+  customerName    String
+  customerEmail   String
+  customerPhone   String?
+  shippingAddress String?     @db.Text
+  totalAmount     Decimal     @db.Decimal(10, 2)
+  status          OrderStatus @default(PENDING)
+  paymentStatus   PaymentStatus @default(PENDING)
+  paymentMethod   String?
+  paymentId       String?
+  notes           String?     @db.Text
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  completedAt     DateTime?
+
+  // Relations
+  user            User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId          Int?
+  items           OrderItem[]
+
+  // Access control
+  @@allow('create', true) // Anyone can create orders
+  @@allow('read', auth() == user || auth().role == ADMIN) // Users can read own orders, admins can read all
+  @@allow('update,delete', auth().role == ADMIN) // Only admin can update/delete
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+// Order items
+model OrderItem {
+  id          Int      @id @default(autoincrement())
+  quantity    Int      @default(1)
+  price       Decimal  @db.Decimal(10, 2)
+  createdAt   DateTime @default(now())
+
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId     Int
+  photo       Photo    @relation(fields: [photoId], references: [id], onDelete: Restrict)
+  photoId     Int
+
+  // Access control
+  @@allow('all', true) // Managed through orders
+}

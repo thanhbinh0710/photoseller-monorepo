@@ -1,0 +1,25 @@
+{
+  "socialMedia": [
+    {
+      "id": "instagram",
+      "name": "Instagram",
+      "url": "https://www.instagram.com/nlt._kien/",
+      "icon": "instagram"
+    },
+    {
+      "id": "facebook",
+      "name": "Facebook",
+      "url": "https://www.facebook.com/fotobykien",
+      "icon": "facebook"
+    },
+    {
+      "id": "tiktok",
+      "name": "TikTok",
+      "url": "https://tiktok.com/@fotobykien",
+      "icon": "tiktok"
+    }
+  ],
+  "contact": {
+    "email": "fotobykien@gmail.com"
+  }
+}
