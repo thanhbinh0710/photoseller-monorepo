@@ -1,102 +1,259 @@
-# Turborepo starter
+# Photoseller Monorepo
 
-This Turborepo starter is maintained by the Turborepo core team.
+Một monorepo full-stack cho Photoseller - nền tảng thương mại điện tử bán ảnh được xây dựng với các công nghệ web hiện đại.
 
-## Using this example
+## Tổng Quan Dự Án
 
-Run the following command:
+Photoseller là một nền tảng thương mại điện tử toàn diện để mua và bán ảnh. Monorepo này chứa toàn bộ ngăn xếp ứng dụng bao gồm API backend, ứng dụng web frontend, và các tiện ích chia sẻ.
 
-```sh
-npx create-turbo@latest
+## Cơ Cấu Là Gì?
+
+### Các Ứng Dụng
+
+- **`apps/backend`** - Máy chủ API NestJS
+  - API RESTful để quản lý ảnh, xác thực và giao dịch
+  - Cơ sở dữ liệu: MariaDB với Prisma ORM
+  - Xác thực: Xác thực dựa trên JWT
+  - Kiểm soát truy cập với ZenStack
+
+- **`apps/frontend`** - Ứng dụng web Next.js
+  - Giao diện người dùng React hiện đại với TypeScript
+  - Các tính năng thương mại điện tử (danh sách sản phẩm, bộ sưu tập, giỏ hàng)
+  - Xác thực người dùng (đăng nhập, đăng ký)
+  - Hỗ trợ đa ngôn ngữ
+  - Thiết kế responsive
+
+### Các Gói (Thư Viện Chia Sẻ)
+
+- **`packages/ui`** - Thư viện thành phần React chia sẻ
+  - Các thành phần giao diện tái sử dụng
+  - Sử dụng bởi ứng dụng frontend
+
+- **`packages/eslint-config`** - Các cài đặt ESLint
+  - Cấu hình cơ bản
+  - Cấu hình Next.js
+  - Cấu hình React
+
+- **`packages/typescript-config`** - Các cấu hình TypeScript
+  - Cấu hình cơ bản
+  - Cấu hình Next.js
+  - Cấu hình thư viện React
+
+## Yêu Cầu Hệ Thống
+
+- **Node.js** phiên bản 18+ hoặc 20+
+- **pnpm** phiên bản 8+ (trình quản lý gói)
+- **Docker & Docker Compose** (cho cơ sở dữ liệu)
+- **Git** phiên bản 2.0+
+
+## Hướng Dẫn Bắt Đầu Nhanh
+
+### 1. Cài đặt các phụ thuộc
+
+```bash
+pnpm install
 ```
 
-## What's inside?
+### 2. Thiết lập biến môi trường
 
-This Turborepo includes the following packages/apps:
-
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo build
+Backend (`apps/backend/.env`):
+```bash
+DATABASE_URL="mysql://user:password@localhost:3306/photoseller"
+JWT_SECRET="your-secret-key"
+JWT_EXPIRATION="24h"
 ```
 
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo build
-pnpm dlx turbo build
-pnpm exec turbo build
+Frontend (`apps/frontend/.env.local`):
+```bash
+NEXT_PUBLIC_API_URL="http://localhost:3000"
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+### 3. Khởi động cơ sở dữ liệu
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo build --filter=docs
+```bash
+cd apps/backend
+docker-compose up -d
 ```
 
-Without global `turbo`:
+### 4. Chạy các migration cơ sở dữ liệu
 
-```sh
-npx turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
+```bash
+pnpm -F backend db:migrate
 ```
 
-### Develop
+### 5. Khởi động các máy chủ phát triển
 
-To develop all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo dev
+```bash
+pnpm dev
 ```
 
-Without global `turbo`, use your package manager:
+Cách này sẽ khởi động:
+- Frontend trên `http://localhost:3001`
+- Backend API trên `http://localhost:3000`
 
-```sh
-cd my-turborepo
-npx turbo dev
-pnpm exec turbo dev
-pnpm exec turbo dev
+## Cơ Cấu Dự Án
+
+```
+photoseller-monorepo/
+├── apps/
+│   ├── backend/          # API NestJS
+│   │   ├── src/
+│   │   ├── prisma/       # Lược đồ cơ sở dữ liệu & migration
+│   │   └── docker/       # Cấu hình Docker
+│   └── frontend/         # Ứng dụng web Next.js
+│       ├── app/          # Định tuyến ứng dụng Next.js
+│       ├── components/   # Các thành phần React
+│       └── lib/          # Tiện ích & trợ giúp
+├── packages/
+│   ├── ui/               # Các thành phần giao diện chia sẻ
+│   ├── eslint-config/    # Các cài đặt ESLint
+│   └── typescript-config/ # Các cấu hình TypeScript
+├── package.json          # Thư mục gốc workspace
+├── pnpm-workspace.yaml   # Cấu hình workspace pnpm
+├── turbo.json            # Cấu hình build Turbo
+└── README.md             # Tệp này
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+## Các Lệnh Sẵn Có
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+### Phát Triển
 
-```sh
-turbo dev --filter=web
+```bash
+# Khởi động tất cả các ứng dụng ở chế độ phát triển
+pnpm dev
+
+# Khởi động ứng dụng cụ thể
+pnpm dev -F backend
+pnpm dev -F frontend
 ```
 
-Without global `turbo`:
+### Xây Dựng
+
+```bash
+# Xây dựng tất cả các ứng dụng và gói
+pnpm build
+
+# Xây dựng ứng dụng cụ thể
+pnpm build -F backend
+pnpm build -F frontend
+```
+
+### Kiểm Tra Linting & Định Dạng
+
+```bash
+# Chạy ESLint
+pnpm lint
+
+# Định dạng mã với Prettier
+pnpm format
+
+# Kiểm tra kiểu dáng mã
+pnpm check-format
+```
+
+### Cơ Sở Dữ Liệu
+
+```bash
+# Chạy migration
+pnpm -F backend db:migrate
+
+# Seed cơ sở dữ liệu
+pnpm -F backend db:seed
+
+# Đặt lại cơ sở dữ liệu
+pnpm -F backend db:reset
+```
+
+## Docker & Triển Khai
+
+### Xây dựng các hình ảnh Docker
+
+```bash
+# Hình ảnh backend
+docker build -t photoseller-backend apps/backend
+
+# Hình ảnh frontend
+docker build -t photoseller-frontend apps/frontend
+```
+
+### Chạy với Docker Compose
+
+Xem `apps/backend/docker-compose.yml` để cấu hình phát triển cục bộ.
+
+## Công Nghệ Sử Dụng
+
+### Backend
+- **Runtime**: Node.js
+- **Framework**: NestJS
+- **Cơ sở dữ liệu**: MariaDB
+- **ORM**: Prisma
+- **Kiểm soát truy cập**: ZenStack
+- **Ngôn ngữ**: TypeScript
+
+### Frontend
+- **Framework**: Next.js 14+
+- **Thư viện giao diện**: React 18+
+- **Định kiểu**: Tailwind CSS
+- **Thư viện thành phần**: Ant Design
+- **Ngôn ngữ**: TypeScript
+
+### Monorepo
+- **Trình quản lý Workspace**: pnpm
+- **Công cụ xây dựng**: Turbo
+- **Linter**: ESLint
+- **Formatter**: Prettier
+
+## Quy Trình Phát Triển
+
+1. Tạo một nhánh mới cho tính năng của bạn
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+2. Thực hiện các thay đổi trong ứng dụng/gói liên quan
+
+3. Kiểm tra các thay đổi của bạn
+   ```bash
+   pnpm test
+   ```
+
+4. Commit các thay đổi của bạn
+   ```bash
+   git add .
+   git commit -m "feat: mô tả các thay đổi"
+   ```
+
+5. Push lên remote
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+
+6. Tạo một Pull Request
+
+## Xử Lý Sự Cố
+
+### Cổng đã được sử dụng
+- Frontend: Thay đổi cổng trong `apps/frontend/next.config.ts`
+- Backend: Đặt biến môi trường `PORT`
+
+### Sự cố kết nối cơ sở dữ liệu
+- Đảm bảo Docker đang chạy: `docker-compose up -d`
+- Kiểm tra thông tin xác thực cơ sở dữ liệu trong `.env`
+- Chạy migration: `pnpm -F backend db:migrate`
+
+### Sự cố về phụ thuộc
+- Xóa cache: `pnpm store prune`
+- Cài đặt lại: `pnpm install --force`
+
+## Giấy Phép
+
+[Thêm giấy phép của bạn ở đây]
+
+## Đóng Góp
+
+Chúng tôi hoan nghênh các đóng góp! Vui lòng tuân theo quy trình phát triển ở trên.
+
+Đối với các sự cố và yêu cầu tính năng, vui lòng tạo một issue trên GitHub.
 
 ```sh
 npx turbo dev --filter=web
