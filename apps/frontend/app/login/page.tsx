@@ -2,35 +2,40 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Form, Input, Button, Spin } from "antd";
+import { Form, Input, Button, Spin, message } from "antd";
 import {
   MailOutlined,
   LockOutlined,
   EyeInvisibleOutlined,
   EyeTwoTone,
 } from "@ant-design/icons";
+import { useLanguage } from "@/lib/language-context";
+import { loginUser } from "@/lib/api";
 
 export default function LoginPage() {
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
 
   const handleLoginSubmit = async (values: any) => {
     setLoading(true);
     try {
-      // Replace with actual API call
-      // const response = await fetch("/api/auth/login", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify(values),
-      // });
+      // Call backend API to login
+      const result = await loginUser({
+        email: values.email,
+        password: values.password,
+      });
 
-      console.log("Logging in with:", values);
+      // Show success message
+      message.success(t.auth.login.successMessage || "Đăng nhập thành công!");
 
-      // Temporary login logic
-      localStorage.setItem("user_logged_in", "true");
+      // Redirect to home page
       window.location.href = "/";
     } catch (err) {
       console.error("Login error:", err);
+      const errorMessage =
+        err instanceof Error ? err.message : "Đăng nhập thất bại";
+      message.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -59,7 +64,7 @@ export default function LoginPage() {
               {/* Login Form */}
               <div>
                 <h1 className="text-xl font-semibold text-background/80 mb-6">
-                  Đăng nhập
+                  {t.auth.login.title}
                 </h1>
 
                 <Form
@@ -72,23 +77,23 @@ export default function LoginPage() {
                   <Form.Item
                     label={
                       <span className="text-background/80 font-medium text-xs">
-                        Email
+                        {t.auth.login.emailLabel}
                       </span>
                     }
                     name="email"
                     rules={[
                       {
                         required: true,
-                        message: "Vui lòng nhập email",
+                        message: t.auth.login.errorEmail,
                       },
                       {
                         type: "email",
-                        message: "Email không hợp lệ",
+                        message: t.auth.login.errorEmailInvalid,
                       },
                     ]}
                   >
                     <Input
-                      placeholder="@email.com"
+                      placeholder={t.auth.login.emailPlaceholder}
                       disabled={loading}
                       prefix={
                         <MailOutlined style={{ color: "rgb(156, 163, 175)" }} />
@@ -102,23 +107,23 @@ export default function LoginPage() {
                   <Form.Item
                     label={
                       <span className="text-background/80 font-medium text-xs">
-                        Mật khẩu
+                        {t.auth.login.passwordLabel}
                       </span>
                     }
                     name="password"
                     rules={[
                       {
                         required: true,
-                        message: "Vui lòng nhập mật khẩu",
+                        message: t.auth.login.errorPassword,
                       },
                       {
                         min: 6,
-                        message: "Mật khẩu phải có ít nhất 6 ký tự",
+                        message: t.auth.login.errorPasswordMin,
                       },
                     ]}
                   >
                     <Input.Password
-                      placeholder="••••••••"
+                      placeholder={t.auth.login.passwordPlaceholder}
                       disabled={loading}
                       prefix={
                         <LockOutlined style={{ color: "rgb(156, 163, 175)" }} />
@@ -147,18 +152,18 @@ export default function LoginPage() {
                       loading={loading}
                       className="!bg-background !text-foreground !border-background hover:!bg-background/90 hover:!text-foreground font-bold border-8 transition-colors !py-6"
                     >
-                      Đăng nhập
+                      {t.auth.login.submitButton}
                     </Button>
                   </Form.Item>
                 </Form>
                 <div>
                   <p className="text-sm text-center text-background">
-                    Chưa có tài khoản?{" "}
+                    {t.auth.login.noAccount}{" "}
                     <a
                       href="/register"
                       className="!text-blue-700  hover:!underline"
                     >
-                      Đăng ký
+                      {t.auth.login.signUp}
                     </a>
                   </p>
                 </div>

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Form, Input, Button, Spin } from "antd";
+import { Form, Input, Button, Spin, message } from "antd";
 import {
   MailOutlined,
   LockOutlined,
@@ -10,28 +10,34 @@ import {
   EyeInvisibleOutlined,
   EyeTwoTone,
 } from "@ant-design/icons";
+import { useLanguage } from "@/lib/language-context";
+import { registerUser } from "@/lib/api";
 
 export default function RegisterPage() {
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
 
   const handleRegisterSubmit = async (values: any) => {
     setLoading(true);
     try {
-      // Replace with actual API call
-      // const response = await fetch("/api/auth/register", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify(values),
-      // });
+      // Call backend API to register
+      const result = await registerUser({
+        email: values.email,
+        password: values.password,
+        name: values.name,
+      });
 
-      console.log("Registering with:", values);
+      // Show success message
+      message.success(t.auth.register.successMessage || "Đăng ký thành công!");
 
-      // Temporary register & auto login logic
-      localStorage.setItem("user_logged_in", "true");
+      // Redirect to home page
       window.location.href = "/";
     } catch (err) {
       console.error("Register error:", err);
+      const errorMessage =
+        err instanceof Error ? err.message : "Đăng ký thất bại";
+      message.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -60,7 +66,7 @@ export default function RegisterPage() {
               {/* Register Form */}
               <div>
                 <h1 className="text-xl font-semibold text-background/80 mb-6">
-                  Đăng ký
+                  {t.auth.register.title}
                 </h1>
 
                 <Form
@@ -73,19 +79,19 @@ export default function RegisterPage() {
                   <Form.Item
                     label={
                       <span className="text-background/80 font-medium text-xs">
-                        Họ tên
+                        {t.auth.register.nameLabel}
                       </span>
                     }
                     name="name"
                     rules={[
                       {
                         required: true,
-                        message: "Vui lòng nhập họ tên",
+                        message: t.auth.register.errorName,
                       },
                     ]}
                   >
                     <Input
-                      placeholder="Nguyễn Văn A"
+                      placeholder={t.auth.register.namePlaceholder}
                       disabled={loading}
                       prefix={
                         <UserOutlined style={{ color: "rgb(156, 163, 175)" }} />
@@ -99,23 +105,23 @@ export default function RegisterPage() {
                   <Form.Item
                     label={
                       <span className="text-background/80 font-medium text-xs">
-                        Email
+                        {t.auth.register.emailLabel}
                       </span>
                     }
                     name="email"
                     rules={[
                       {
                         required: true,
-                        message: "Vui lòng nhập email",
+                        message: t.auth.register.errorEmail,
                       },
                       {
                         type: "email",
-                        message: "Email không hợp lệ",
+                        message: t.auth.register.errorEmailInvalid,
                       },
                     ]}
                   >
                     <Input
-                      placeholder="@email.com"
+                      placeholder={t.auth.register.emailPlaceholder}
                       disabled={loading}
                       prefix={
                         <MailOutlined style={{ color: "rgb(156, 163, 175)" }} />
@@ -129,23 +135,23 @@ export default function RegisterPage() {
                   <Form.Item
                     label={
                       <span className="text-background/80 font-medium text-xs">
-                        Mật khẩu
+                        {t.auth.register.passwordLabel}
                       </span>
                     }
                     name="password"
                     rules={[
                       {
                         required: true,
-                        message: "Vui lòng nhập mật khẩu",
+                        message: t.auth.register.errorPassword,
                       },
                       {
                         min: 6,
-                        message: "Mật khẩu phải có ít nhất 6 ký tự",
+                        message: t.auth.register.errorPasswordMin,
                       },
                     ]}
                   >
                     <Input.Password
-                      placeholder="••••••••"
+                      placeholder={t.auth.register.passwordPlaceholder}
                       disabled={loading}
                       prefix={
                         <LockOutlined style={{ color: "rgb(156, 163, 175)" }} />
@@ -168,7 +174,7 @@ export default function RegisterPage() {
                   <Form.Item
                     label={
                       <span className="text-background/80 font-medium text-xs">
-                        Xác nhận mật khẩu
+                        {t.auth.register.confirmPasswordLabel}
                       </span>
                     }
                     name="confirmPassword"
@@ -176,7 +182,7 @@ export default function RegisterPage() {
                     rules={[
                       {
                         required: true,
-                        message: "Vui lòng xác nhận mật khẩu",
+                        message: t.auth.register.errorConfirmPassword,
                       },
                       ({ getFieldValue }) => ({
                         validator(_, value) {
@@ -184,14 +190,14 @@ export default function RegisterPage() {
                             return Promise.resolve();
                           }
                           return Promise.reject(
-                            new Error("Mật khẩu không trùng khớp"),
+                            new Error(t.auth.register.errorPasswordMismatch),
                           );
                         },
                       }),
                     ]}
                   >
                     <Input.Password
-                      placeholder="••••••••"
+                      placeholder={t.auth.register.confirmPasswordPlaceholder}
                       disabled={loading}
                       prefix={
                         <LockOutlined style={{ color: "rgb(156, 163, 175)" }} />
@@ -220,18 +226,18 @@ export default function RegisterPage() {
                       loading={loading}
                       className="!bg-background !text-foreground !border-background hover:!bg-background/90 hover:!text-foreground font-bold border-8 transition-colors !py-6"
                     >
-                      Đăng ký
+                      {t.auth.register.submitButton}
                     </Button>
                   </Form.Item>
                 </Form>
                 <div>
                   <p className="text-sm text-center text-background">
-                    Đã có tài khoản?{" "}
+                    {t.auth.register.hasAccount}{" "}
                     <a
                       href="/login"
                       className="!text-blue-700  hover:!underline"
                     >
-                      Đăng nhập
+                      {t.auth.register.signIn}
                     </a>
                   </p>
                 </div>

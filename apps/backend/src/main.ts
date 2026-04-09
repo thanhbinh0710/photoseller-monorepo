@@ -17,9 +17,10 @@ async function bootstrap() {
 
   // CORS configuration
   app.enableCors({
-    origin: process.env.NODE_ENV === 'production' 
-      ? ['https://your-frontend-domain.com'] 
-      : ['http://localhost:3000'],
+    origin:
+      process.env.NODE_ENV === 'production'
+        ? ['https://your-frontend-domain.com']
+        : ['http://localhost:3000'],
     credentials: true,
   });
 
@@ -50,8 +51,8 @@ async function bootstrap() {
 
   const port = process.env.PORT || 8000;
   await app.listen(port);
-  
-  console.log(`🚀 Application is running on: http://localhost:${port}`);
-  console.log(`📚 Swagger documentation: http://localhost:${port}/api`);
+
+  console.log(`Application is running on: http://localhost:${port}`);
+  console.log(`Swagger documentation: http://localhost:${port}/api`);
 }
 bootstrap();

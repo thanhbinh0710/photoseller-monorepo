@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   photoseller-be-app:
     build:
@@ -8,7 +6,7 @@ services:
     container_name: photoseller-be-app
     restart: unless-stopped
     ports:
-      - "8000:8000"
+      - '8000:8000'
     environment:
       - NODE_ENV=development
       - DATABASE_URL=mysql://photoseller:photoseller@mariadb:3306/photoseller
@@ -26,7 +24,7 @@ services:
       - photoseller_network
     depends_on:
       - mariadb
-    command: npm run start:dev
+    command: pnpm run start:dev
 
   mariadb:
     image: mariadb:11
@@ -50,7 +48,7 @@ services:
     container_name: photoseller-phpmyadmin
     restart: unless-stopped
     ports:
-      - "8080:80"
+      - '8080:80'
     environment:
       PMA_HOST: mariadb
       PMA_PORT: 3306
