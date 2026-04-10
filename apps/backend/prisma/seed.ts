@@ -16,7 +16,8 @@ async function main() {
     create: {
       email: 'admin@photoseller.com',
       password: adminPassword,
-      name: 'Admin PhotoSeller',
+      firstName: 'Admin',
+      lastName: 'PhotoSeller',
       role: 'ADMIN',
       isActive: true,
     },
@@ -31,7 +32,8 @@ async function main() {
     create: {
       email: 'user1@example.com',
       password: user1Password,
-      name: 'John Doe',
+      firstName: 'John',
+      lastName: 'Doe',
       role: 'USER',
       isActive: true,
     },
@@ -45,7 +47,8 @@ async function main() {
     create: {
       email: 'user2@example.com',
       password: user2Password,
-      name: 'Jane Smith',
+      firstName: 'Jane',
+      lastName: 'Smith',
       role: 'USER',
       isActive: true,
     },

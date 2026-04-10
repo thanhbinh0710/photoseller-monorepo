@@ -1,6 +1,17 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { UpdatePasswordDto, AddTelephoneDto, UpdateTelephoneDto, AddAddressDto, UpdateAddressDto } from './dto';
+import {
+  UpdatePasswordDto,
+  AddTelephoneDto,
+  UpdateTelephoneDto,
+  AddAddressDto,
+  UpdateAddressDto,
+} from './dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -13,7 +24,8 @@ export class UserService {
       select: {
         id: true,
         email: true,
-        name: true,
+        firstName: true,
+        lastName: true,
         role: true,
         isActive: true,
         createdAt: true,
@@ -87,14 +99,16 @@ export class UserService {
 
     // Check if phone number already exists for this user
     const existingTelephone = await this.prisma.telephone.findFirst({
-      where: { 
+      where: {
         userId,
         phoneNumber: addTelephoneDto.phoneNumber,
       },
     });
 
     if (existingTelephone) {
-      throw new BadRequestException('This phone number already exists in your list');
+      throw new BadRequestException(
+        'This phone number already exists in your list',
+      );
     }
 
     // If setting as primary, unset other primary telephones
@@ -121,7 +135,11 @@ export class UserService {
     };
   }
 
-  async updateTelephone(userId: number, telephoneId: number, updateTelephoneDto: UpdateTelephoneDto) {
+  async updateTelephone(
+    userId: number,
+    telephoneId: number,
+    updateTelephoneDto: UpdateTelephoneDto,
+  ) {
     const telephone = await this.prisma.telephone.findUnique({
       where: { id: telephoneId },
     });
@@ -131,7 +149,9 @@ export class UserService {
     }
 
     if (telephone.userId !== userId) {
-      throw new ForbiddenException('Not authorized to update this phone number');
+      throw new ForbiddenException(
+        'Not authorized to update this phone number',
+      );
     }
 
     // If updating phone number, check for duplicates (excluding current one)
@@ -145,7 +165,9 @@ export class UserService {
       });
 
       if (existingTelephone) {
-        throw new BadRequestException('This phone number already exists in your list');
+        throw new BadRequestException(
+          'This phone number already exists in your list',
+        );
       }
     }
 
@@ -180,7 +202,9 @@ export class UserService {
     }
 
     if (telephone.userId !== userId) {
-      throw new ForbiddenException('Not authorized to delete this phone number');
+      throw new ForbiddenException(
+        'Not authorized to delete this phone number',
+      );
     }
 
     await this.prisma.telephone.delete({
@@ -204,7 +228,9 @@ export class UserService {
     }
 
     if (telephone.userId !== userId) {
-      throw new ForbiddenException('Not authorized to modify this phone number');
+      throw new ForbiddenException(
+        'Not authorized to modify this phone number',
+      );
     }
 
     // Unset all primary telephones for this user
@@ -262,7 +288,11 @@ export class UserService {
     };
   }
 
-  async updateAddress(userId: number, addressId: number, updateAddressDto: UpdateAddressDto) {
+  async updateAddress(
+    userId: number,
+    addressId: number,
+    updateAddressDto: UpdateAddressDto,
+  ) {
     const address = await this.prisma.address.findUnique({
       where: { id: addressId },
     });

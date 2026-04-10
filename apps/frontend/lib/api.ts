@@ -18,7 +18,8 @@ interface ApiResponse<T = any> {
 interface RegisterRequest {
   email: string;
   password: string;
-  name: string;
+  firstName: string;
+  lastName: string;
 }
 
 interface LoginRequest {
@@ -30,7 +31,8 @@ interface AuthResponse {
   user: {
     id: number;
     email: string;
-    name: string;
+    firstName: string;
+    lastName: string;
     role: string;
     isActive: boolean;
     createdAt?: string;
@@ -50,9 +52,9 @@ async function apiRequest<T = any>(
   const url = `${API_BASE_URL}${endpoint}`;
 
   // Add default headers
-  const headers: HeadersInit = {
+  const headers: Record<string, string> = {
     "Content-Type": "application/json",
-    ...options.headers,
+    ...(options.headers as Record<string, string>),
   };
 
   // Add auth token if available
@@ -66,6 +68,8 @@ async function apiRequest<T = any>(
     const response = await fetch(url, {
       ...options,
       headers,
+      mode: 'cors',
+      credentials: 'include',
     });
 
     const data: ApiResponse<T> = await response.json();
@@ -99,6 +103,7 @@ export async function registerUser(
     // Store auth token for future requests
     localStorage.setItem("access_token", response.data.access_token);
     localStorage.setItem("user", JSON.stringify(response.data.user));
+    localStorage.setItem("user_logged_in", "true");
     return response.data;
   }
 
@@ -121,6 +126,7 @@ export async function loginUser(
     // Store auth token for future requests
     localStorage.setItem("access_token", response.data.access_token);
     localStorage.setItem("user", JSON.stringify(response.data.user));
+    localStorage.setItem("user_logged_in", "true");
     return response.data;
   }
 
@@ -134,6 +140,7 @@ export async function loginUser(
 export function logoutUser(): void {
   localStorage.removeItem("access_token");
   localStorage.removeItem("user");
+  localStorage.removeItem("user_logged_in");
 }
 
 /**

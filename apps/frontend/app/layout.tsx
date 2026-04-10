@@ -2,8 +2,6 @@ import type React from "react";
 import type { Metadata, Viewport } from "next";
 import { Roboto, Geist_Mono, Newsreader } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
-import { AntdRegistry } from "@ant-design/nextjs-registry";
-import { AntdProvider } from "@/components/antd-provider";
 import { LanguageProvider } from "@/lib/language-context";
 import "./globals.css";
 
@@ -40,11 +38,7 @@ export default function RootLayout({
   return (
     <html lang="vi" className={`${roboto.variable} ${newsreader.variable}`}>
       <body suppressHydrationWarning>
-        <AntdRegistry>
-          <AntdProvider>
-            <LanguageProvider>{children}</LanguageProvider>
-          </AntdProvider>
-        </AntdRegistry>
+        <LanguageProvider>{children}</LanguageProvider>
         <Analytics />
       </body>
     </html>
