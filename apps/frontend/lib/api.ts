@@ -68,8 +68,8 @@ async function apiRequest<T = any>(
     const response = await fetch(url, {
       ...options,
       headers,
-      mode: 'cors',
-      credentials: 'include',
+      mode: "cors",
+      credentials: "include",
     });
 
     const data: ApiResponse<T> = await response.json();
