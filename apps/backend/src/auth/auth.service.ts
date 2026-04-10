@@ -34,13 +34,15 @@ export class AuthService {
       data: {
         email: registerDto.email,
         password: hashedPassword,
-        name: registerDto.name,
+        firstName: registerDto.firstName,
+        lastName: registerDto.lastName,
         role: UserRole.USER, // Default to USER role
       },
       select: {
         id: true,
         email: true,
-        name: true,
+        firstName: true,
+        lastName: true,
         role: true,
         isActive: true,
         createdAt: true,
@@ -98,7 +100,8 @@ export class AuthService {
         user: {
           id: user.id,
           email: user.email,
-          name: user.name,
+          firstName: user.firstName,
+          lastName: user.lastName,
           role: user.role,
           isActive: user.isActive,
         },
@@ -114,7 +117,8 @@ export class AuthService {
       select: {
         id: true,
         email: true,
-        name: true,
+        firstName: true,
+        lastName: true,
         role: true,
         isActive: true,
       },

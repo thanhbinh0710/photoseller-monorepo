@@ -19,11 +19,20 @@ export class RegisterDto {
   password: string;
 
   @ApiProperty({
-    example: 'John Doe',
-    description: 'User full name',
+    example: 'John',
+    description: 'User first name',
   })
   @IsString()
-  @MinLength(2, { message: 'Name must be at least 2 characters' })
+  @MinLength(2, { message: 'First name must be at least 2 characters' })
   @MaxLength(100)
-  name: string;
+  firstName: string;
+
+  @ApiProperty({
+    example: 'Doe',
+    description: 'User last name',
+  })
+  @IsString()
+  @MinLength(2, { message: 'Last name must be at least 2 characters' })
+  @MaxLength(100)
+  lastName: string;
 }

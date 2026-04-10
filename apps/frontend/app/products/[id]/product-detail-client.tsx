@@ -3,10 +3,15 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Dropdown } from "antd";
 import { useLanguage } from "@/lib/language-context";
 import { FeaturedGallery } from "@/components/featured-gallery";
-import { DownOutlined } from "@ant-design/icons";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const products = [
   {
@@ -251,30 +256,25 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               <h3 className="text-xs font-semibold tracking-widest text-neutral-900 uppercase mb-4">
                 {t.shop.filters.size}
               </h3>
-              <Dropdown
-                menu={{
-                  items: [
-                    { label: t.shop.sizeOptions.small, key: "small" },
-                    { label: t.shop.sizeOptions.medium, key: "medium" },
-                    { label: t.shop.sizeOptions.large, key: "large" },
-                    { label: t.shop.sizeOptions.xlarge, key: "xlarge" },
-                  ],
-                  onClick: (e) => setSelectedSize(e.key),
-                }}
-                placement="bottomLeft"
-                trigger={["click"]}
-              >
-                <button className="w-full px-4 py-2 border border-neutral-200 bg-white text-sm text-neutral-900 text-left hover:border-neutral-900 transition-all cursor-pointer flex justify-between items-center">
-                  {selectedSize === "small"
-                    ? t.shop.sizeOptions.small
-                    : selectedSize === "medium"
-                      ? t.shop.sizeOptions.medium
-                      : selectedSize === "large"
-                        ? t.shop.sizeOptions.large
-                        : t.shop.sizeOptions.xlarge}
-                  <DownOutlined />
-                </button>
-              </Dropdown>
+              <Select value={selectedSize} onValueChange={setSelectedSize}>
+                <SelectTrigger className="w-full px-4 py-2 border border-neutral-200 bg-white text-sm text-neutral-900 text-left hover:border-neutral-900 transition-all">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="small">
+                    {t.shop.sizeOptions.small}
+                  </SelectItem>
+                  <SelectItem value="medium">
+                    {t.shop.sizeOptions.medium}
+                  </SelectItem>
+                  <SelectItem value="large">
+                    {t.shop.sizeOptions.large}
+                  </SelectItem>
+                  <SelectItem value="xlarge">
+                    {t.shop.sizeOptions.xlarge}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Frame Selection */}

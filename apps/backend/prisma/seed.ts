@@ -16,7 +16,8 @@ async function main() {
     create: {
       email: 'admin@photoseller.com',
       password: adminPassword,
-      name: 'Admin PhotoSeller',
+      firstName: 'Admin',
+      lastName: 'PhotoSeller',
       role: 'ADMIN',
       isActive: true,
     },
@@ -31,7 +32,8 @@ async function main() {
     create: {
       email: 'user1@example.com',
       password: user1Password,
-      name: 'John Doe',
+      firstName: 'John',
+      lastName: 'Doe',
       role: 'USER',
       isActive: true,
     },
@@ -45,7 +47,8 @@ async function main() {
     create: {
       email: 'user2@example.com',
       password: user2Password,
-      name: 'Jane Smith',
+      firstName: 'Jane',
+      lastName: 'Smith',
       role: 'USER',
       isActive: true,
     },
@@ -215,7 +218,7 @@ async function main() {
 
   // Prepare size array for random assignment
   const sizes = [sizeA4, sizeA3, sizeA2, sizeA1];
-  
+
   // Price range for random pricing (in dollars)
   const priceMin = 29.99;
   const priceMax = 79.99;
@@ -231,28 +234,30 @@ async function main() {
 
   for (const { folder, category, categoryName } of photoFolders) {
     const folderPath = path.join(__dirname, '..', 'storage', 'photo', folder);
-    
+
     // Read all files from the folder
-    const files = fs.readdirSync(folderPath).filter(file => {
+    const files = fs.readdirSync(folderPath).filter((file) => {
       // Skip .gitkeep and only process image files
       return file !== '.gitkeep' && /\.(jpg|jpeg|png)$/i.test(file);
     });
 
-    console.log(`\n📂 Processing ${categoryName} folder: ${files.length} photos found`);
+    console.log(
+      `\n📂 Processing ${categoryName} folder: ${files.length} photos found`,
+    );
 
     for (const file of files) {
       // Extract name without extension
       const nameWithoutExt = file.replace(/\.(jpg|jpeg|png)$/i, '');
-      
+
       // Generate slug from filename (lowercase, replace special chars with hyphens)
       const slug = `${nameWithoutExt.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${folder}`;
-      
+
       // Random size selection
       const randomSize = sizes[Math.floor(Math.random() * sizes.length)];
-      
+
       // Random price within range
       const randomPrice = parseFloat(
-        (priceMin + Math.random() * (priceMax - priceMin)).toFixed(2)
+        (priceMin + Math.random() * (priceMax - priceMin)).toFixed(2),
       );
 
       // Create photo record
@@ -274,10 +279,14 @@ async function main() {
       totalPhotosCreated++;
     }
 
-    console.log(`✅ Created ${files.length} photos in ${categoryName} category`);
+    console.log(
+      `✅ Created ${files.length} photos in ${categoryName} category`,
+    );
   }
 
-  console.log(`\n🎉 Successfully seeded ${totalPhotosCreated} photos from storage folders!`);
+  console.log(
+    `\n🎉 Successfully seeded ${totalPhotosCreated} photos from storage folders!`,
+  );
 
   console.log('\n🎉 Database seeded successfully!');
   console.log('\n📝 Test Credentials:');

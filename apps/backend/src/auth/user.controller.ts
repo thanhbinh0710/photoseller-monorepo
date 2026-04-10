@@ -1,7 +1,32 @@
-import { Controller, Get, Post, Put, Delete, Patch, Body, Param, ParseIntPipe, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Patch,
+  Body,
+  Param,
+  ParseIntPipe,
+  UseGuards,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiParam,
+} from '@nestjs/swagger';
 import { UserService } from './user.service';
-import { UpdatePasswordDto, AddTelephoneDto, UpdateTelephoneDto, AddAddressDto, UpdateAddressDto } from './dto';
+import {
+  UpdatePasswordDto,
+  AddTelephoneDto,
+  UpdateTelephoneDto,
+  AddAddressDto,
+  UpdateAddressDto,
+} from './dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
 

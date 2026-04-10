@@ -12,18 +12,25 @@ import {
   ShoppingBag,
   LogOut,
   Package,
-  Settings,
   LogIn,
   UserPlus,
+  ShoppingCart,
+  ChevronDown,
 } from "lucide-react";
-import { Dropdown, Badge, Popover } from "antd";
-import {
-  UserOutlined,
-  ShoppingCartOutlined,
-  DownOutlined,
-} from "@ant-design/icons";
 import { useLanguage } from "@/lib/language-context";
 import { LanguageSwitcher } from "./language-switcher";
+import { Badge } from "@/components/ui/badge";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -46,48 +53,9 @@ export function Header() {
     window.location.href = "/";
   };
 
-  // Collections dropdown menu
-  const collectionsMenu = {
-    items: [
-      {
-        key: "flowers",
-        label: (
-          <Link
-            href="/shop?category=flowers"
-            className="text-base hover:text-foreground"
-          >
-            {t.collections.categories.flowers}
-          </Link>
-        ),
-      },
-      {
-        key: "people",
-        label: (
-          <Link
-            href="/shop?category=people"
-            className="text-base hover:text-foreground"
-          >
-            {t.collections.categories.people}
-          </Link>
-        ),
-      },
-      {
-        key: "objects",
-        label: (
-          <Link
-            href="/shop?category=objects"
-            className="text-base hover:text-foreground"
-          >
-            {t.collections.categories.objects}
-          </Link>
-        ),
-      },
-    ],
-  };
-
   // Account popover content
   const accountPopoverContent = (
-    <div className="bg-[#05090c] rounded-sm py-1 min-w-[200px]">
+    <div className="rounded-sm py-1 min-w-[200px]">
       {isLoggedIn ? (
         <>
           <Link
@@ -102,12 +70,7 @@ export function Header() {
           >
             <Package size={16} className="opacity-70" /> ORDERS
           </Link>
-          <Link
-            href="/settings"
-            className="flex items-center gap-3 px-3 py-2 text-[14px]  text-muted-foreground/40! hover:text-foreground! transition-all duration-300 ease-out uppercase font-sans font-semibold"
-          >
-            <Settings size={16} className="opacity-70" /> SETTINGS
-          </Link>
+
           <div className="bg-foreground/30 my-2 h-px"></div>
           <div
             onClick={() => {
@@ -156,15 +119,34 @@ export function Header() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-10">
-            <Dropdown menu={collectionsMenu} trigger={["hover"]}>
-              <Link
-                href="/collections"
-                className="text-base text-muted-foreground/40 hover:text-foreground transition-all duration-300 ease-out cursor-pointer flex items-center gap-2 "
-              >
-                {t.nav.collections}
-                <DownOutlined style={{ fontSize: "12px" }} />
-              </Link>
-            </Dropdown>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Link
+                  href="/collections"
+                  className="text-base text-muted-foreground/40 hover:text-foreground transition-all duration-300 ease-out cursor-pointer flex items-center gap-2 "
+                >
+                  {t.nav.collections}
+                  <ChevronDown style={{ fontSize: "12px" }} />
+                </Link>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" side="bottom" sideOffset={8}>
+                <DropdownMenuItem asChild>
+                  <Link href="/shop?category=flowers">
+                    {t.collections.categories.flowers}
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/shop?category=people">
+                    {t.collections.categories.people}
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/shop?category=objects">
+                    {t.collections.categories.objects}
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             <Link
               href="/about"
@@ -186,23 +168,34 @@ export function Header() {
             </button>
 
             <Popover
-              content={accountPopoverContent}
-              trigger="click"
-              placement="bottomRight"
               open={isAccountPopoverOpen}
               onOpenChange={setIsAccountPopoverOpen}
-              overlayClassName="border-2 rounded-lg border-border !fixed"
-              arrow={false}
             >
-              <button className="text-foreground hover:text-foreground/80 transition-colors cursor-pointer">
-                <UserOutlined style={{ fontSize: "20px" }} />
-              </button>
+              <PopoverTrigger asChild>
+                <button className="text-foreground hover:text-foreground/80 transition-colors cursor-pointer">
+                  <User size={20} />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent
+                align="end"
+                side="bottom"
+                sideOffset={8}
+                className="w-56"
+              >
+                {accountPopoverContent}
+              </PopoverContent>
             </Popover>
 
-            <button className="text-foreground hover:text-foreground/80 transition-colors cursor-pointer">
-              <Badge count={0} size="small">
-                <ShoppingCartOutlined style={{ fontSize: "20px" }} />
-              </Badge>
+            <button className="text-foreground hover:text-foreground/80 transition-colors cursor-pointer relative">
+              {0 > 0 && (
+                <Badge
+                  variant="destructive"
+                  className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0"
+                >
+                  {0}
+                </Badge>
+              )}
+              <ShoppingCart size={20} />
             </button>
 
             <LanguageSwitcher />
@@ -275,23 +268,34 @@ export function Header() {
                   </button>
 
                   <Popover
-                    content={accountPopoverContent}
-                    trigger="click"
-                    placement="bottomRight"
                     open={isAccountPopoverOpen}
                     onOpenChange={setIsAccountPopoverOpen}
-                    overlayClassName="border border-border !fixed "
-                    arrow={false}
                   >
-                    <button className="text-foreground hover:text-foreground/70 transition-colors">
-                      <UserOutlined style={{ fontSize: "20px" }} />
-                    </button>
+                    <PopoverTrigger asChild>
+                      <button className="text-foreground hover:text-foreground/70 transition-colors">
+                        <User size={20} />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      align="end"
+                      side="bottom"
+                      sideOffset={8}
+                      className="w-56"
+                    >
+                      {accountPopoverContent}
+                    </PopoverContent>
                   </Popover>
 
                   <button className="text-foreground hover:text-foreground/70 transition-colors relative">
-                    <Badge count={0} size="small">
-                      <ShoppingCartOutlined style={{ fontSize: "20px" }} />
-                    </Badge>
+                    {0 > 0 && (
+                      <Badge
+                        variant="destructive"
+                        className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0"
+                      >
+                        {0}
+                      </Badge>
+                    )}
+                    <ShoppingCart size={20} />
                   </button>
                   <LanguageSwitcher />
                 </div>
