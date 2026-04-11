@@ -12,9 +12,6 @@ import { ChangePassword } from "@/components/profile/change-password";
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState("profile");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userInfo, setUserInfo] = useState({
-    name: "Vũ Trịnh Thạnh Bình",
-  });
 
   useEffect(() => {
     const status = localStorage.getItem("user_logged_in");
@@ -31,7 +28,7 @@ export default function ProfilePage() {
   const renderContent = () => {
     switch (activeTab) {
       case "profile":
-        return <AccountInfo userInfo={userInfo} />;
+        return <AccountInfo />;
       case "addresses":
         return <Addresses />;
       case "password":
@@ -39,12 +36,12 @@ export default function ProfilePage() {
       case "orders":
         return <Orders />;
       default:
-        return <AccountInfo userInfo={userInfo} />;
+        return <AccountInfo />;
     }
   };
 
   return (
-    <main className="min-h-screen bg-white flex flex-col">
+    <main className="min-h-screen bg-neutral-950 text-white flex flex-col">
       <Header />
 
       {/* Main Content - Fills remaining space */}
@@ -52,11 +49,7 @@ export default function ProfilePage() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <ProfileSidebar
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
-              userInfo={userInfo}
-            />
+            <ProfileSidebar activeTab={activeTab} onTabChange={setActiveTab} />
           </div>
 
           {/* Content Area */}

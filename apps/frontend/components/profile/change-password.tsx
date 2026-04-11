@@ -30,7 +30,7 @@ function PasswordInput({
 }: PasswordInputProps) {
   return (
     <div className="mb-6">
-      <label className="block text-sm font-medium text-gray-700 mb-2">
+      <label className="block text-sm font-medium text-neutral-300 mb-2">
         {label}
       </label>
       <div className="relative">
@@ -45,13 +45,15 @@ function PasswordInput({
                 ? "Nhập mật khẩu mới (tối thiểu 8 ký tự)"
                 : "Nhập lại mật khẩu mới"
           }
-          className={`pr-10 ${error ? "border-red-500" : ""}`}
+          className={`pr-10 bg-neutral-800 border-neutral-700 text-white placeholder-neutral-500 ${
+            error ? "border-red-500" : ""
+          }`}
           disabled={isLoading}
         />
         <button
           type="button"
           onClick={() => onTogglePassword(field)}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-300"
         >
           {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
         </button>
@@ -137,10 +139,8 @@ export function ChangePassword() {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-8 border border-gray-200">
-      <h2 className="text-2xl font-semibold text-gray-900 mb-6">
-        Đổi mật khẩu
-      </h2>
+    <div className="bg-neutral-900 rounded-lg shadow-sm p-8 border border-neutral-700">
+      <h2 className="text-2xl font-semibold text-white mb-6">Đổi mật khẩu</h2>
 
       <form onSubmit={handleSubmit} className="max-w-2xl">
         <PasswordInput
@@ -192,11 +192,11 @@ export function ChangePassword() {
         />
 
         {/* Password Requirements */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-          <h4 className="font-semibold text-blue-900 mb-2">
+        <div className="bg-neutral-800 border border-neutral-700 rounded-lg p-4 mb-6">
+          <h4 className="font-semibold text-neutral-100 mb-2">
             Yêu cầu mật khẩu:
           </h4>
-          <ul className="text-sm text-blue-800 space-y-1">
+          <ul className="text-sm text-neutral-400 space-y-1">
             <li>✓ Ít nhất 8 ký tự</li>
             <li>✓ Chứa ít nhất một chữ hoa (A-Z)</li>
             <li>✓ Chứa ít nhất một chữ thường (a-z)</li>
@@ -206,12 +206,16 @@ export function ChangePassword() {
 
         {/* Action Buttons */}
         <div className="flex gap-4">
-          <Button type="submit" disabled={isLoading}>
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="bg-amber-100 text-black px-6 py-2 rounded cursor-pointer hover:bg-amber-200 disabled:opacity-50"
+          >
             {isLoading ? "Đang cập nhật..." : "Cập nhật mật khẩu"}
-          </Button>
-          <Button
+          </button>
+          <button
             type="button"
-            variant="outline"
+            className="border border-neutral-700 text-neutral-300 px-6 py-2 rounded hover:bg-neutral-800 cursor-pointer disabled:opacity-50"
             onClick={() => {
               setFormData({
                 currentPassword: "",
@@ -223,7 +227,7 @@ export function ChangePassword() {
             disabled={isLoading}
           >
             Hủy
-          </Button>
+          </button>
         </div>
       </form>
     </div>

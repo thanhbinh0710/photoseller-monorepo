@@ -10,14 +10,14 @@ import {
   AccordionContent,
 } from "@/components/ui/accordion";
 import clsx from "clsx";
+import { useFetchUserProfile } from "@/lib/hooks/useFetchUserProfile";
 
 interface ProfileSidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   userInfo?: {
-    name: string;
-    fpoints?: number;
-    status?: string;
+    firstName: string;
+    lastName: string;
   };
 }
 
@@ -27,6 +27,10 @@ export function ProfileSidebar({
   userInfo,
 }: ProfileSidebarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { userProfile } = useFetchUserProfile();
+
+  // Use fetched data if userInfo prop is not provided
+  const displayUserInfo = userInfo || userProfile;
 
   const menuItems = [
     {
@@ -80,18 +84,25 @@ export function ProfileSidebar({
       {/* User Info Section */}
       <div
         className={clsx(
-          "bg-white rounded-lg shadow-sm p-6 h-fit border border-gray-300 overflow-hidden",
+          "bg-neutral-900 rounded-lg shadow-sm p-6 h-fit border border-neutral-700 overflow-hidden",
           mobileOpen ? "block" : "hidden md:block",
         )}
       >
-        <div className="flex items-center mb-3 border-b border-gray-200 pb-4">
-          <div className="w-12 h-12 bg-background rounded-full flex items-center justify-center text-white font-semibold text-base">
-            {userInfo?.name?.charAt(0)?.toUpperCase() || "U"}
+        <div className="flex items-center mb-3 border-b border-neutral-700 pb-4">
+          <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-black font-semibold text-base">
+            {displayUserInfo?.firstName?.charAt(0)?.toUpperCase() ||
+              displayUserInfo?.lastName?.charAt(0)?.toUpperCase() ||
+              "U"}
           </div>
           <div className="ml-3">
-            <h3 className="font-semibold text-gray-900 text-sm">
-              {userInfo?.name || "User"}
+            <h3 className="font-semibold text-white text-sm">
+              {displayUserInfo &&
+              (displayUserInfo.firstName?.trim() ||
+                displayUserInfo.lastName?.trim())
+                ? `${displayUserInfo.firstName || ""} ${displayUserInfo.lastName || ""}`.trim()
+                : "User"}
             </h3>
+            <p className="text-xs text-neutral-400">Thành viên</p>
           </div>
         </div>
 
@@ -101,7 +112,7 @@ export function ProfileSidebar({
             <div key={item.key}>
               {item.children ? (
                 <AccordionItem value={item.key}>
-                  <AccordionTrigger className="text-gray-900 font-medium">
+                  <AccordionTrigger className="text-white font-medium hover:text-neutral-300">
                     <span className="flex items-center gap-2">
                       {item.icon}
                       <span className="text-sm">{item.label}</span>
@@ -114,10 +125,10 @@ export function ProfileSidebar({
                           key={child.key}
                           onClick={() => handleMenuClick(child.key)}
                           className={clsx(
-                            "w-full flex items-center gap-2 px-3 py-2 text-sm rounded transition-colors",
+                            "w-full flex items-center gap-2 px-3 py-2 text-sm rounded transition-colors cursor-pointer",
                             activeTab === child.key
-                              ? "bg-gray-100 text-gray-800 font-semibold"
-                              : "text-gray-700 hover:bg-gray-100",
+                              ? "bg-neutral-800 text-white border-l-2 border-amber-100"
+                              : "text-neutral-400 hover:text-white hover:bg-neutral-800",
                           )}
                         >
                           {child.icon}
@@ -131,10 +142,10 @@ export function ProfileSidebar({
                 <button
                   onClick={() => handleMenuClick(item.key)}
                   className={clsx(
-                    "w-full flex items-center gap-2 px-3 py-2 text-sm rounded transition-colors",
+                    "w-full flex items-center gap-2 px-3 py-2 text-sm rounded transition-colors cursor-pointer",
                     activeTab === item.key
-                      ? "bg-gray-100 text-gray-800 font-semibold"
-                      : "text-gray-700 hover:bg-gray-100",
+                      ? "bg-neutral-800 text-white border-l-2 border-amber-100"
+                      : "text-neutral-400 hover:text-white hover:bg-neutral-800",
                   )}
                 >
                   {item.icon}

@@ -3,6 +3,7 @@
 import type React from "react";
 import { useState } from "react";
 import { useLanguage } from "@/lib/language-context";
+import { Button } from "@/components/ui/button";
 
 export function NewsletterSection() {
   const [email, setEmail] = useState("");
@@ -53,13 +54,14 @@ export function NewsletterSection() {
               required
               className="flex-1 px-4 py-3 bg-neutral-50 border border-neutral-200 text-neutral-900 text-sm placeholder:text-neutral-400 focus:outline-none focus:border-neutral-400 focus:ring-1 focus:ring-neutral-300"
             />
-            <button
+            <Button
               type="submit"
-              className="inline-block text-sm font-medium border border-foreground px-8 py-3 hover:bg-foreground hover:text-background transition-colors cursor-pointer"
+              variant="outline"
+              size="lg"
               onClick={handleSubmit}
             >
               {t.newsletter.button}
-            </button>
+            </Button>
           </form>
         )}
       </div>

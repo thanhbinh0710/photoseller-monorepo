@@ -50,6 +50,8 @@ async function apiRequest<T = any>(
   options: RequestInit = {},
 ): Promise<ApiResponse<T>> {
   const url = `${API_BASE_URL}${endpoint}`;
+  const method = options.method || "GET";
+  console.log(`[API] Requesting: ${method} ${url}`);
 
   // Add default headers
   const headers: Record<string, string> = {
@@ -65,24 +67,70 @@ async function apiRequest<T = any>(
   }
 
   try {
-    const response = await fetch(url, {
-      ...options,
-      headers,
-      mode: "cors",
-      credentials: "include",
-    });
+    // Create abort controller for timeout
+    const abortController = new AbortController();
+    const timeoutId = setTimeout(() => abortController.abort(), 10000); // 10s timeout
 
-    const data: ApiResponse<T> = await response.json();
+    try {
+      console.log(`[API] Fetch with headers:`, Object.keys(headers));
 
-    if (!response.ok) {
-      throw new Error(
-        data.message || `HTTP ${response.status}: ${response.statusText}`,
-      );
+      const response = await fetch(url, {
+        ...options,
+        headers,
+        mode: "cors",
+        credentials: "include",
+        signal: abortController.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      console.log(`[API] Response: ${response.status} ${response.statusText}`);
+      console.log(`[API] Content-Type:`, response.headers.get("content-type"));
+
+      // Check if response is JSON
+      const contentType = response.headers.get("content-type");
+      let data: ApiResponse<T>;
+
+      if (contentType?.includes("application/json")) {
+        const responseText = await response.text();
+        console.log(`[API] Raw response:`, responseText.substring(0, 300));
+        data = JSON.parse(responseText);
+      } else {
+        // Handle non-JSON responses
+        const text = await response.text();
+        console.error(`[API] Non-JSON response:`, text.substring(0, 200));
+        throw new Error(
+          `Backend returned non-JSON response (${response.status}): ${text.substring(0, 100)}`,
+        );
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || `HTTP ${response.status}: ${response.statusText}`,
+        );
+      }
+
+      console.log(`[API] Success:`, data);
+      return data;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error instanceof Error && error.name === "AbortError") {
+        throw new Error(
+          `Request timeout. Backend at ${API_BASE_URL} not responding. Please check if Docker backend is running.`,
+        );
+      }
+      if (error instanceof SyntaxError) {
+        throw new Error(`Invalid JSON response from backend: ${error.message}`);
+      }
+      throw error;
     }
-
-    return data;
   } catch (error) {
-    console.error(`API Error [${endpoint}]:`, error);
+    const errorMsg =
+      error instanceof Error ? error.message : String(error) || "Unknown error";
+    console.error(`API Error [${endpoint}]: ${errorMsg}`, {
+      url: `${API_BASE_URL}${endpoint}`,
+      timestamp: new Date().toISOString(),
+    });
     throw error;
   }
 }

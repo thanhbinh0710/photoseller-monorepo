@@ -7,7 +7,6 @@ import { useState, useEffect, useRef } from "react";
 import {
   Menu,
   X,
-  Search,
   User,
   ShoppingBag,
   LogOut,
@@ -15,7 +14,6 @@ import {
   LogIn,
   UserPlus,
   ShoppingCart,
-  ChevronDown,
 } from "lucide-react";
 import { useLanguage } from "@/lib/language-context";
 import { LanguageSwitcher } from "./language-switcher";
@@ -25,12 +23,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -40,12 +32,49 @@ export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAccountPopoverOpen, setIsAccountPopoverOpen] = useState(false);
+  const [isInHero, setIsInHero] = useState(true);
+  const [isNearHeroEnd, setIsNearHeroEnd] = useState(false);
   const { t } = useLanguage();
+  const pathname = usePathname();
 
   useEffect(() => {
     const status = localStorage.getItem("user_logged_in");
     setIsLoggedIn(status === "true");
   }, []);
+
+  useEffect(() => {
+    // Only enable transparent header on home page
+    if (pathname !== "/") {
+      setIsInHero(false);
+      setIsNearHeroEnd(false);
+      return;
+    }
+
+    const handleScroll = () => {
+      // Hero section is min-h-screen, so we check if scroll position is less than viewport height
+      const heroHeight = window.innerHeight;
+      const scrollRatio = window.scrollY / heroHeight;
+
+      // isNearHeroEnd: when we're at 60-100% through the hero
+      if (scrollRatio > 0.6 && scrollRatio < 1) {
+        setIsInHero(false);
+        setIsNearHeroEnd(true);
+      }
+      // isInHero: when we're at the beginning (0-60% through the hero)
+      else if (scrollRatio < 0.6) {
+        setIsInHero(true);
+        setIsNearHeroEnd(false);
+      }
+      // Left hero completely
+      else {
+        setIsInHero(false);
+        setIsNearHeroEnd(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [pathname]);
 
   const handleLogout = () => {
     localStorage.removeItem("user_logged_in");
@@ -77,7 +106,7 @@ export function Header() {
               handleLogout();
               setIsAccountPopoverOpen(false);
             }}
-            className="flex items-center gap-3 px-3 py-2 text-[14px]  text-[#a2a8af] hover:text-red-300 transition-colors uppercase w-full cursor-pointer font-semibold"
+            className="flex items-center gap-3 px-3 py-2 text-[14px]  text-gray-500 hover:text-red-400 transition-colors uppercase w-full cursor-pointer font-semibold"
           >
             <LogOut size={16} className="opacity-70" /> LOGOUT
           </div>
@@ -104,9 +133,17 @@ export function Header() {
   );
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background flex items-center h-[70px]">
-      <div className="max-w-[1800px] mx-auto px-3 w-full">
-        <nav className="flex items-center justify-between font-semibold py-4">
+    <div
+      className={`fixed top-0 left-0 right-0 z-50 flex items-center h-[70px] transition-all duration-300 ${
+        isInHero
+          ? "bg-transparent border-b border-transparent"
+          : isNearHeroEnd
+            ? "bg-transparent border-b border-transparent"
+            : "border-b border-primary-600 bg-background"
+      }`}
+    >
+      <div className="max-w-[1800px] mx-auto px-3 w-full h-full flex items-center">
+        <nav className="flex items-center justify-between font-semibold w-full">
           <Link href="/">
             <Image
               src="/Logo.svg"
@@ -119,54 +156,52 @@ export function Header() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-10">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Link
-                  href="/collections"
-                  className="text-base text-muted-foreground/40 hover:text-foreground transition-all duration-300 ease-out cursor-pointer flex items-center gap-2 "
-                >
-                  {t.nav.collections}
-                  <ChevronDown style={{ fontSize: "12px" }} />
-                </Link>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" side="bottom" sideOffset={8}>
-                <DropdownMenuItem asChild>
-                  <Link href="/shop?category=flowers">
-                    {t.collections.categories.flowers}
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/shop?category=people">
-                    {t.collections.categories.people}
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/shop?category=objects">
-                    {t.collections.categories.objects}
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <Link
+              href="/collections"
+              className={`text-base transition-all duration-300 ease-out cursor-pointer ${
+                pathname === "/collections"
+                  ? "text-foreground"
+                  : "text-foreground"
+              }`}
+            >
+              <span
+                className={`inline-block transition-all duration-300 ease-out pb-1 ${
+                  pathname === "/collections"
+                    ? "border-b-2 border-foreground"
+                    : "border-b-2 border-transparent hover:border-foreground"
+                }`}
+              >
+                {t.nav.collections}
+              </span>
+            </Link>
 
             <Link
               href="/about"
-              className="text-base text-muted-foreground/40 hover:text-foreground transition-all duration-300 ease-out cursor-pointer"
+              className={`text-base transition-all duration-300 ease-out cursor-pointer ${
+                pathname === "/about" ? "text-foreground" : "text-foreground"
+              }`}
             >
-              {t.nav.about}
+              <span
+                className={`inline-block transition-all duration-300 ease-out pb-1 ${
+                  pathname === "/about"
+                    ? "border-b-2 border-foreground"
+                    : "border-b-2 border-transparent hover:border-foreground"
+                }`}
+              >
+                {t.nav.about}
+              </span>
             </Link>
             <Link
               href="#contact"
-              className="text-base text-muted-foreground/40 hover:text-foreground transition-all duration-300 ease-out cursor-pointer"
+              className="text-base text-foreground transition-all duration-300 ease-out cursor-pointer"
             >
-              {t.nav.contact}
+              <span className="inline-block transition-all duration-300 ease-out pb-1 border-b-2 border-transparent hover:border-foreground">
+                {t.nav.contact}
+              </span>
             </Link>
           </div>
 
           <div className="hidden md:flex items-center gap-6">
-            <button className="text-foreground hover:text-foreground/80 transition-colors cursor-pointer">
-              <Search size={20} />
-            </button>
-
             <Popover
               open={isAccountPopoverOpen}
               onOpenChange={setIsAccountPopoverOpen}
@@ -179,7 +214,7 @@ export function Header() {
               <PopoverContent
                 align="end"
                 side="bottom"
-                sideOffset={8}
+                sideOffset={20}
                 className="w-56"
               >
                 {accountPopoverContent}
@@ -212,14 +247,26 @@ export function Header() {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden absolute top-full left-0 right-0 bg-background border-b border-border py-6 px-6 z-50">
+          <div className="md:hidden absolute top-full left-0 right-0 bg-background py-6 px-6 z-50">
             <div className="flex flex-col gap-4">
               <Link
                 href="/shop"
-                className="text-base text-muted-foreground hover:text-foreground py-2"
+                className={`text-base transition-all duration-300 ease-out py-2 ${
+                  pathname === "/shop" || pathname === "/collections"
+                    ? "text-foreground"
+                    : "text-foreground"
+                }`}
                 onClick={() => setIsMenuOpen(false)}
               >
-                {t.nav.collections}
+                <span
+                  className={`inline-block transition-all duration-300 ease-out pb-1 ${
+                    pathname === "/shop" || pathname === "/collections"
+                      ? "border-b-2 border-foreground"
+                      : "border-b-2 border-transparent hover:border-foreground"
+                  }`}
+                >
+                  {t.nav.collections}
+                </span>
               </Link>
 
               <div className="pl-4 space-y-2">
@@ -248,25 +295,33 @@ export function Header() {
 
               <Link
                 href="/about"
-                className="text-base text-muted-foreground hover:text-foreground py-2"
+                className={`text-base transition-all duration-300 ease-out py-2 ${
+                  pathname === "/about" ? "text-foreground" : "text-foreground"
+                }`}
                 onClick={() => setIsMenuOpen(false)}
               >
-                {t.nav.about}
+                <span
+                  className={`inline-block transition-all duration-300 ease-out pb-1 ${
+                    pathname === "/about"
+                      ? "border-b-2 border-foreground"
+                      : "border-b-2 border-transparent hover:border-foreground"
+                  }`}
+                >
+                  {t.nav.about}
+                </span>
               </Link>
               <Link
                 href="#contact"
-                className="text-base text-muted-foreground hover:text-foreground py-2"
+                className="text-base text-foreground transition-all duration-300 ease-out py-2"
                 onClick={() => setIsMenuOpen(false)}
               >
-                {t.nav.contact}
+                <span className="inline-block transition-all duration-300 ease-out pb-1 border-b-2 border-transparent hover:border-foreground">
+                  {t.nav.contact}
+                </span>
               </Link>
 
-              <div className="pt-4 space-y-4 border-t border-border">
+              <div className="pt-4 space-y-4 border-t border-primary-600">
                 <div className="flex items-center gap-4">
-                  <button className="text-foreground hover:text-foreground/70 transition-colors">
-                    <Search size={20} />
-                  </button>
-
                   <Popover
                     open={isAccountPopoverOpen}
                     onOpenChange={setIsAccountPopoverOpen}

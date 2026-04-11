@@ -3,12 +3,14 @@ import { IsString, IsBoolean, IsOptional, Matches } from 'class-validator';
 
 export class AddTelephoneDto {
   @ApiProperty({
-    example: '+84901234567',
-    description: 'Phone number with country code',
+    example: '+84901234567 or 0901234567',
+    description:
+      'Phone number (international format with +84, or Vietnamese domestic format)',
   })
   @IsString()
-  @Matches(/^\+?[1-9]\d{1,14}$/, {
-    message: 'Phone number must be valid international format',
+  @Matches(/^[\+]?[\d\s\-\(\)]{9,}$/, {
+    message:
+      'Phone number must contain at least 9 digits (international or domestic format)',
   })
   phoneNumber: string;
 
@@ -25,14 +27,16 @@ export class AddTelephoneDto {
 
 export class UpdateTelephoneDto {
   @ApiProperty({
-    example: '+84907654321',
-    description: 'Updated phone number',
+    example: '+84907654321 or 0907654321',
+    description:
+      'Updated phone number (international format with +84, or Vietnamese domestic format)',
     required: false,
   })
   @IsString()
   @IsOptional()
-  @Matches(/^\+?[1-9]\d{1,14}$/, {
-    message: 'Phone number must be valid international format',
+  @Matches(/^[\+]?[\d\s\-\(\)]{9,}$/, {
+    message:
+      'Phone number must contain at least 9 digits (international or domestic format)',
   })
   phoneNumber?: string;
 
