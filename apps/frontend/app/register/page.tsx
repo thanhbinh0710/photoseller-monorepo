@@ -43,6 +43,7 @@ function FormField({
         )}
         <Input
           type={type}
+          name={name}
           placeholder={placeholder}
           disabled={disabled}
           value={value}
@@ -128,10 +129,10 @@ export default function RegisterPage() {
     try {
       // Call backend API to register
       const result = await registerUser({
-        email: formData.email,
-        password: formData.password,
         firstName: formData.firstName,
         lastName: formData.lastName,
+        email: formData.email,
+        password: formData.password,
       });
 
       // Show success message

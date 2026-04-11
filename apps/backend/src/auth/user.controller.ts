@@ -22,6 +22,7 @@ import {
 import { UserService } from './user.service';
 import {
   UpdatePasswordDto,
+  UpdateProfileDto,
   AddTelephoneDto,
   UpdateTelephoneDto,
   AddAddressDto,
@@ -91,6 +92,41 @@ export class UserController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getProfile(@CurrentUser() user: any) {
     return this.userService.getProfile(user.sub);
+  }
+
+  @Patch('profile')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Update user profile',
+    description: 'Update user first and last name',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Profile updated successfully',
+    schema: {
+      example: {
+        statusCode: 200,
+        success: true,
+        message: 'Profile updated successfully',
+        data: {
+          id: 2,
+          email: 'user1@example.com',
+          firstName: 'John',
+          lastName: 'Doe',
+          role: 'USER',
+          isActive: true,
+          updatedAt: '2026-04-06T10:00:00.000Z',
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async updateProfile(
+    @CurrentUser() user: any,
+    @Body() updateProfileDto: UpdateProfileDto,
+  ) {
+    return this.userService.updateProfile(user.sub, updateProfileDto);
   }
 
   @Put('password')

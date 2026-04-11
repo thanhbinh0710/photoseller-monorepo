@@ -132,33 +132,38 @@ export function Addresses({
     error?: string;
   }) => (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
+      <label className="block text-sm font-medium text-neutral-300 mb-2">
         {label}
       </label>
       <Input
         placeholder={placeholder}
         value={value || ""}
         onChange={(e) => onChange(e.target.value)}
-        className={error ? "border-red-500" : ""}
+        className={`bg-neutral-800 border-neutral-700 text-white placeholder-neutral-500 ${
+          error ? "border-red-500" : ""
+        }`}
       />
       {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
     </div>
   );
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-8 border border-gray-200">
+    <div className="bg-neutral-900 rounded-lg shadow-sm p-8 border border-neutral-700">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold text-gray-900">Địa chỉ</h2>
+        <h2 className="text-2xl font-semibold text-white">Địa chỉ</h2>
         {!isFormVisible && (
-          <Button onClick={() => setIsFormVisible(true)} className="gap-2">
+          <button
+            onClick={() => setIsFormVisible(true)}
+            className="flex items-center gap-2 bg-amber-100 text-black px-4 py-2 rounded cursor-pointer hover:bg-amber-200"
+          >
             <Plus size={16} />
             Thêm địa chỉ
-          </Button>
+          </button>
         )}
       </div>
 
       {isFormVisible && (
-        <Card className="mb-6 border border-gray-200 bg-white p-6">
+        <div className="mb-6 border border-neutral-700 bg-neutral-800 p-6 rounded-lg">
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
@@ -224,10 +229,15 @@ export function Addresses({
             </div>
 
             <div className="flex gap-2 mt-6">
-              <Button type="submit">Lưu địa chỉ</Button>
-              <Button
+              <button
+                type="submit"
+                className="bg-amber-100 text-black px-6 py-2 rounded cursor-pointer hover:bg-amber-200"
+              >
+                Lưu địa chỉ
+              </button>
+              <button
                 type="button"
-                variant="outline"
+                className="border border-neutral-700 text-neutral-300 px-6 py-2 rounded hover:bg-neutral-800 cursor-pointer"
                 onClick={() => {
                   setIsFormVisible(false);
                   setFormData({
@@ -242,58 +252,64 @@ export function Addresses({
                 }}
               >
                 Hủy
-              </Button>
+              </button>
             </div>
           </form>
-        </Card>
+        </div>
       )}
 
       {displayAddresses.length === 0 ? (
-        <div className="text-center py-12 border border-dashed border-gray-300 rounded-lg bg-gray-50">
-          <p className="text-gray-500 text-base">Chưa có địa chỉ nào</p>
+        <div className="text-center py-12 border border-dashed border-neutral-700 rounded-lg bg-neutral-800">
+          <p className="text-neutral-400 text-base">Chưa có địa chỉ nào</p>
         </div>
       ) : (
         <div className="space-y-4">
           {displayAddresses.map((address) => (
-            <Card
+            <div
               key={address.id}
-              className={`border p-6 ${address.isDefault ? "border-blue-500 bg-blue-50" : "border-gray-200 bg-white"}`}
+              className={`border p-6 rounded-lg ${
+                address.isDefault
+                  ? "border-amber-500 bg-neutral-800"
+                  : "border-neutral-700 bg-neutral-800"
+              }`}
             >
               <div className="flex justify-between items-start">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <h3 className="font-semibold text-gray-900">
-                      {address.name}
-                    </h3>
+                    <h3 className="font-semibold text-white">{address.name}</h3>
                     {address.isDefault && (
-                      <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded">
+                      <span className="text-xs bg-amber-100 text-amber-900 px-2 py-1 rounded">
                         Mặc định
                       </span>
                     )}
                   </div>
-                  <p className="text-sm text-gray-600 mb-1">{address.phone}</p>
-                  <p className="text-sm text-gray-600">{address.address}</p>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-neutral-300 mb-1">
+                    {address.phone}
+                  </p>
+                  <p className="text-sm text-neutral-300">{address.address}</p>
+                  <p className="text-sm text-neutral-300">
                     {address.ward}, {address.district}, {address.city}
                   </p>
                 </div>
                 <div className="flex gap-2">
-                  <Button type="button" variant="ghost" size="icon">
-                    <Edit size={16} />
-                  </Button>
-                  <Button
+                  <button
                     type="button"
-                    variant="ghost"
-                    size="icon"
+                    className="p-2 hover:bg-neutral-700 rounded transition-colors cursor-pointer text-neutral-300"
+                  >
+                    <Edit size={16} />
+                  </button>
+                  <button
+                    type="button"
+                    className="p-2 hover:bg-neutral-700 rounded transition-colors cursor-pointer text-red-400 hover:text-red-500"
                     onClick={() =>
                       onDeleteAddress && onDeleteAddress(address.id)
                     }
                   >
-                    <Trash2 size={16} className="text-red-600" />
-                  </Button>
+                    <Trash2 size={16} />
+                  </button>
                 </div>
               </div>
-            </Card>
+            </div>
           ))}
         </div>
       )}

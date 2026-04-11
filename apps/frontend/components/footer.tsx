@@ -4,6 +4,7 @@ import { Instagram, Facebook, Youtube } from "lucide-react";
 import { TikTok } from "@/components/icons/tiktok";
 import { useLanguage } from "@/lib/language-context";
 import socialLinks from "@/lib/social-links.json";
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
 export function Footer() {
@@ -50,7 +51,7 @@ export function Footer() {
                 <a
                   key={social.id}
                   href={social.url}
-                  className="p-2 border border-border hover:bg-foreground hover:text-background hover:border-foreground transition-colors"
+                  className="p-2 border border-foreground text-foreground hover:bg-foreground hover:text-background transition-colors"
                   aria-label={social.name}
                 >
                   {social.icon === "instagram" && <Instagram size={16} />}

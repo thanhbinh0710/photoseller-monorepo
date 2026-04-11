@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/lib/language-context";
 import { toast } from "sonner";
+import { useFetchUserProfile } from "@/lib/hooks/useFetchUserProfile";
 
 interface UserAccountInfo {
   firstName: string;
@@ -25,8 +26,9 @@ export function AccountInfo({
   isLoading: externalLoading = false,
 }: AccountInfoProps) {
   const [isSaving, setIsSaving] = useState(false);
-  const [isLoadingData, setIsLoadingData] = useState(true);
   const { t } = useLanguage();
+  const { userProfile, isLoading: isLoadingData } = useFetchUserProfile();
+  const [telephoneId, setTelephoneId] = useState<number | undefined>();
   const [formData, setFormData] = useState<UserAccountInfo>({
     firstName: "",
     lastName: "",
@@ -36,40 +38,18 @@ export function AccountInfo({
 
   const [errors, setErrors] = useState<Partial<UserAccountInfo>>({});
 
-  // Fetch user data từ BE
+  // Update form when userProfile is fetched
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        setIsLoadingData(true);
-        const response = await fetch("http://localhost:8000/user/profile", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Lỗi khi tải dữ liệu");
-        }
-
-        const data = await response.json();
-        if (data.data) {
-          setFormData({
-            firstName: data.data.firstName || "",
-            lastName: data.data.lastName || "",
-            phone: data.data.telephones?.[0]?.phoneNumber || "",
-            email: data.data.email || "",
-          });
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-        toast.error("Không thể tải dữ liệu hồ sơ");
-      } finally {
-        setIsLoadingData(false);
-      }
-    };
-
-    fetchUserData();
-  }, []);
+    if (userProfile) {
+      setFormData({
+        firstName: userProfile.firstName || "",
+        lastName: userProfile.lastName || "",
+        phone: userProfile.phone || "",
+        email: userProfile.email || "",
+      });
+      setTelephoneId(userProfile.telephoneId);
+    }
+  }, [userProfile]);
 
   const validateForm = () => {
     const newErrors: Partial<UserAccountInfo> = {};
@@ -86,12 +66,6 @@ export function AccountInfo({
       newErrors.phone = "Vui lòng nhập số điện thoại";
     }
 
-    if (!formData.email) {
-      newErrors.email = "Vui lòng nhập email";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Email không hợp lệ";
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -105,17 +79,77 @@ export function AccountInfo({
 
     setIsSaving(true);
     try {
-      const response = await fetch("http://localhost:8000/user/profile", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        },
-        body: JSON.stringify(formData),
-      });
+      const token = localStorage.getItem("access_token");
 
-      if (!response.ok) {
-        throw new Error("Lỗi khi cập nhật thông tin");
+      // Update profile (firstName, lastName)
+      const profileResponse = await fetch(
+        "http://localhost:8000/user/profile",
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+          }),
+        },
+      );
+
+      if (!profileResponse.ok) {
+        const errorData = await profileResponse.json();
+        throw new Error(`Profile update failed: ${JSON.stringify(errorData)}`);
+      }
+
+      // Update phone if it changed
+      if (formData.phone) {
+        if (telephoneId) {
+          // Update existing phone
+          const phoneResponse = await fetch(
+            `http://localhost:8000/user/telephones/${telephoneId}`,
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                phoneNumber: formData.phone,
+              }),
+            },
+          );
+
+          if (!phoneResponse.ok) {
+            const errorData = await phoneResponse.json();
+            throw new Error(
+              `Phone update failed: ${JSON.stringify(errorData)}`,
+            );
+          }
+        } else {
+          // Create new phone if doesn't exist
+          const phoneResponse = await fetch(
+            `http://localhost:8000/user/telephones`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                phoneNumber: formData.phone,
+                isPrimary: true,
+              }),
+            },
+          );
+
+          if (!phoneResponse.ok) {
+            const errorData = await phoneResponse.json();
+            throw new Error(
+              `Phone creation failed: ${JSON.stringify(errorData)}`,
+            );
+          }
+        }
       }
 
       if (onSave) {
@@ -123,28 +157,26 @@ export function AccountInfo({
       }
       toast.success("Thông tin đã được lưu");
     } catch (error) {
-      console.error("Error saving user data:", error);
-      toast.error("Lỗi khi lưu thông tin");
+      toast.error(
+        error instanceof Error ? error.message : "Lỗi khi lưu thông tin",
+      );
     } finally {
       setIsSaving(false);
     }
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-8 border border-gray-300">
-      <h2 className="text-2xl font-semibold text-gray-900 mb-6">
-        Hồ sơ cá nhân
-      </h2>
+    <div className="bg-neutral-900 rounded-lg shadow-sm p-8 border border-neutral-700">
+      <h2 className="text-2xl font-semibold text-white mb-6">Hồ sơ cá nhân</h2>
 
       <form onSubmit={handleSave} className="max-w-2xl">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* First Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-neutral-300 mb-2">
               Họ
             </label>
             <Input
-              placeholder="Vũ Trịnh"
               value={formData.firstName}
               onChange={(e) =>
                 setFormData((prev) => ({
@@ -152,7 +184,10 @@ export function AccountInfo({
                   firstName: e.target.value,
                 }))
               }
-              className={errors.firstName ? "border-red-500" : "text-gray-700"}
+              className={`bg-neutral-800 border-neutral-700 text-white placeholder-neutral-500 ${
+                errors.firstName ? "border-red-500" : ""
+              }`}
+              placeholder="Nhập họ"
               disabled={isSaving || externalLoading || isLoadingData}
             />
             {errors.firstName && (
@@ -162,11 +197,10 @@ export function AccountInfo({
 
           {/* Last Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-neutral-300 mb-2">
               Tên
             </label>
             <Input
-              placeholder="Thạnh Bình"
               value={formData.lastName}
               onChange={(e) =>
                 setFormData((prev) => ({
@@ -174,7 +208,10 @@ export function AccountInfo({
                   lastName: e.target.value,
                 }))
               }
-              className={errors.lastName ? "border-red-500" : "text-gray-400"}
+              className={`bg-neutral-800 border-neutral-700 text-white placeholder-neutral-500 ${
+                errors.lastName ? "border-red-500" : ""
+              }`}
+              placeholder="Nhập tên"
               disabled={isSaving || externalLoading || isLoadingData}
             />
             {errors.lastName && (
@@ -185,11 +222,10 @@ export function AccountInfo({
 
         {/* Phone */}
         <div className="mt-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-neutral-300 mb-2">
             Số điện thoại
           </label>
           <Input
-            placeholder="090132648"
             value={formData.phone}
             onChange={(e) =>
               setFormData((prev) => ({
@@ -197,7 +233,10 @@ export function AccountInfo({
                 phone: e.target.value,
               }))
             }
-            className={errors.phone ? "border-red-500" : "text-gray-400"}
+            className={`bg-neutral-800 border-neutral-700 text-white placeholder-neutral-500 ${
+              errors.phone ? "border-red-500" : ""
+            }`}
+            placeholder="Nhập số điện thoại"
             disabled={isSaving || externalLoading || isLoadingData}
           />
           {errors.phone && (
@@ -207,40 +246,30 @@ export function AccountInfo({
 
         {/* Email */}
         <div className="mt-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-neutral-300 mb-2">
             Email
           </label>
           <Input
-            placeholder="trinhthanhbinh2015@gmail.com"
             type="email"
             value={formData.email}
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                email: e.target.value,
-              }))
-            }
-            className={errors.email ? "border-red-500" : "text-gray-400"}
-            disabled={isSaving || externalLoading || isLoadingData}
+            className="bg-neutral-800 text-neutral-400 cursor-not-allowed border-neutral-700"
+            disabled={true}
           />
-          {errors.email && (
-            <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-          )}
         </div>
 
         {/* Action Buttons */}
         <div className="flex gap-4 mt-8">
-          <Button
+          <button
             type="submit"
             disabled={isSaving || externalLoading || isLoadingData}
+            className="bg-amber-100 text-black px-6 py-2 rounded font-semibold hover:bg-amber-200 transition-colors disabled:opacity-50 cursor-pointer"
           >
             {isSaving || externalLoading || isLoadingData
               ? "Đang lưu..."
               : "Lưu thông tin"}
-          </Button>
-          <Button
+          </button>
+          <button
             type="button"
-            variant="outline"
             onClick={() => {
               // Reset về data từ API
               setFormData({
@@ -252,9 +281,10 @@ export function AccountInfo({
               setErrors({});
             }}
             disabled={isSaving || externalLoading || isLoadingData}
+            className="border border-neutral-700 text-neutral-300 px-6 py-2 rounded hover:bg-neutral-800 transition-colors disabled:opacity-50 cursor-pointer"
           >
             Hủy
-          </Button>
+          </button>
         </div>
       </form>
     </div>

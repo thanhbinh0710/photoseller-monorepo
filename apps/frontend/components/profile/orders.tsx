@@ -18,20 +18,15 @@ interface OrdersProps {
 }
 
 export function Orders({ orders }: OrdersProps) {
-  const getStatusVariant = (
-    status: string,
-  ): "default" | "secondary" | "outline" | "destructive" => {
-    const variantMap: Record<
-      string,
-      "default" | "secondary" | "outline" | "destructive"
-    > = {
-      pending: "outline",
-      processing: "default",
-      shipped: "secondary",
-      delivered: "default",
-      cancelled: "destructive",
+  const getStatusVariant = (status: string) => {
+    const statusMap: Record<string, string> = {
+      pending: "bg-orange-100 text-orange-900",
+      processing: "bg-blue-100 text-blue-900",
+      shipped: "bg-purple-100 text-purple-900",
+      delivered: "bg-green-100 text-green-900",
+      cancelled: "bg-red-100 text-red-900",
     };
-    return variantMap[status] || "default";
+    return statusMap[status] || "bg-neutral-700 text-white";
   };
 
   const getStatusLabel = (status: string) => {
@@ -73,14 +68,16 @@ export function Orders({ orders }: OrdersProps) {
 
   if (displayOrders.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-sm p-8 border border-gray-200">
-        <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+      <div className="bg-neutral-900 rounded-lg shadow-sm p-8 border border-neutral-700">
+        <h2 className="text-2xl font-semibold text-white mb-6">
           Đơn hàng của tôi
         </h2>
         <div className="text-center py-8">
-          <p className="text-gray-500 mb-4">Bạn chưa có đơn hàng nào</p>
+          <p className="text-neutral-400 mb-4">Bạn chưa có đơn hàng nào</p>
           <Link href="/collections">
-            <Button>Mua sắm ngay</Button>
+            <button className="bg-amber-100 text-black px-6 py-2 rounded cursor-pointer hover:bg-amber-200">
+              Mua sắm ngay
+            </button>
           </Link>
         </div>
       </div>
@@ -88,8 +85,8 @@ export function Orders({ orders }: OrdersProps) {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-8 border border-gray-200">
-      <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+    <div className="bg-neutral-900 rounded-lg shadow-sm p-8 border border-neutral-700">
+      <h2 className="text-2xl font-semibold text-white mb-6">
         Đơn hàng của tôi
       </h2>
 
@@ -97,31 +94,31 @@ export function Orders({ orders }: OrdersProps) {
         {displayOrders.map((order) => (
           <div
             key={order.id}
-            className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
+            className="border border-neutral-700 rounded-lg p-6 hover:bg-neutral-800 transition-colors"
           >
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               {/* Order Info */}
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
-                  <ShoppingBag size={20} className="text-gray-600" />
-                  <h3 className="text-lg font-semibold text-gray-900">
+                  <ShoppingBag size={20} className="text-neutral-400" />
+                  <h3 className="text-lg font-semibold text-white">
                     {order.id}
                   </h3>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm text-gray-600">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                   <div>
-                    <p className="text-gray-500">Ngày đặt</p>
-                    <p className="font-medium text-gray-900">{order.date}</p>
+                    <p className="text-neutral-400">Ngày đặt</p>
+                    <p className="font-medium text-neutral-100">{order.date}</p>
                   </div>
                   <div>
-                    <p className="text-gray-500">Số lượng</p>
-                    <p className="font-medium text-gray-900">
+                    <p className="text-neutral-400">Số lượng</p>
+                    <p className="font-medium text-neutral-100">
                       {order.items} sản phẩm
                     </p>
                   </div>
                   <div>
-                    <p className="text-gray-500">Tổng tiền</p>
-                    <p className="font-medium text-gray-900">
+                    <p className="text-neutral-400">Tổng tiền</p>
+                    <p className="font-medium text-neutral-100">
                       {new Intl.NumberFormat("vi-VN", {
                         style: "currency",
                         currency: "VND",
@@ -133,14 +130,16 @@ export function Orders({ orders }: OrdersProps) {
 
               {/* Status & Action */}
               <div className="flex flex-col items-start md:items-end gap-3">
-                <Badge variant={getStatusVariant(order.status)}>
+                <span
+                  className={`px-4 py-2 text-xs font-semibold rounded ${getStatusVariant(order.status)}`}
+                >
                   {getStatusLabel(order.status)}
-                </Badge>
+                </span>
                 <Link href={`/profile/orders/${order.id}`}>
-                  <Button variant="ghost" size="sm">
-                    <Eye size={16} className="mr-2" />
+                  <button className="flex items-center gap-2 text-sm text-amber-100 hover:text-amber-200 transition-colors cursor-pointer">
+                    <Eye size={16} />
                     Xem chi tiết
-                  </Button>
+                  </button>
                 </Link>
               </div>
             </div>

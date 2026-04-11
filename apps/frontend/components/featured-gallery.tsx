@@ -4,6 +4,7 @@ import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useLanguage } from "@/lib/language-context";
+import { Button } from "@/components/ui/button";
 
 const galleryImages = [
   {
@@ -133,22 +134,26 @@ export function FeaturedGallery() {
       <div className="relative group/slider">
         {/* Navigation Buttons - Minimal style */}
         {canScrollLeft && (
-          <button
+          <Button
             onClick={() => scroll("left")}
-            className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center bg-background border border-border opacity-0 group-hover/slider:opacity-100 transition-opacity duration-300 hover:bg-foreground hover:text-background hover:border-foreground"
+            variant="outline"
+            size="icon"
+            className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover/slider:opacity-100 transition-opacity duration-300"
             aria-label="Scroll left"
           >
             <ChevronLeft className="w-4 h-4" />
-          </button>
+          </Button>
         )}
         {canScrollRight && (
-          <button
+          <Button
             onClick={() => scroll("right")}
-            className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center bg-background border border-border opacity-0 group-hover/slider:opacity-100 transition-opacity duration-300 hover:bg-foreground hover:text-background hover:border-foreground"
+            variant="outline"
+            size="icon"
+            className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover/slider:opacity-100 transition-opacity duration-300"
             aria-label="Scroll right"
           >
             <ChevronRight className="w-4 h-4" />
-          </button>
+          </Button>
         )}
 
         {/* Horizontal Slider */}
@@ -182,12 +187,11 @@ export function FeaturedGallery() {
 
       <div className="max-w-6xl mx-auto px-6">
         <div className="text-center mt-12">
-          <a
-            href="/collections"
-            className="inline-block text-sm font-medium border border-foreground px-8 py-3 hover:bg-foreground hover:text-background transition-colors"
-          >
-            {language === "vi" ? "Xem tất cả" : "View All"}
-          </a>
+          <Link href="/collections">
+            <Button variant="outline" size="lg">
+              {language === "vi" ? "Xem tất cả" : "View All"}
+            </Button>
+          </Link>
         </div>
       </div>
     </section>

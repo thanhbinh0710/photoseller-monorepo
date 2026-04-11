@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Heart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useLanguage } from "@/lib/language-context";
@@ -81,40 +81,47 @@ const products = [
   },
 ];
 
-const filterOptions = ["categories", "size", "orientation"] as const;
+const colors = [
+  { name: "warm", color: "#e8cbc0" },
+  { name: "neutral", color: "#a89e90" },
+  { name: "cool", color: "#8b9db0" },
+  { name: "dark", color: "#3d3d3d" },
+  { name: "sepia", color: "#c9a876" },
+  { name: "muted", color: "#9b9b9b" },
+  { name: "light", color: "#d4d4d4" },
+];
 
 export default function ShopContent() {
   const { t } = useLanguage();
-  const [selectedFrame, setSelectedFrame] = useState<
-    "none" | "black" | "white"
-  >("none");
-  const [openFilter, setOpenFilter] = useState<string | null>(null);
   const [sortOpen, setSortOpen] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState<{
-    categories: string[];
-    size: string[];
+    collections: string[];
+    colorTone: string[];
     orientation: string[];
+    size: string[];
   }>({
-    categories: [],
-    size: [],
+    collections: [],
+    colorTone: [],
     orientation: [],
+    size: [],
   });
-
-  const filterRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+  const [priceRange, setPriceRange] = useState([20, 500]);
   const sortRef = useRef<HTMLDivElement>(null);
 
-  // Handle click outside to close dropdowns
+  const collections = [
+    "All Collections",
+    "Landscape",
+    "Portrait",
+    "Abstract",
+    "Architecture",
+    "Nature",
+    "Street",
+  ];
+  const orientations = ["All", "Portrait", "Landscape", "Square"];
+  const sizes = ["All Sizes", "30x40 cm", "40x50 cm", "50x70 cm", "60x80 cm"];
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      // Check if click is outside all filter dropdowns
-      const isOutsideFilters = Object.values(filterRefs.current).every(
-        (ref) => ref && !ref.contains(event.target as Node),
-      );
-      if (isOutsideFilters && openFilter) {
-        setOpenFilter(null);
-      }
-
-      // Check if click is outside sort dropdown
       if (sortRef.current && !sortRef.current.contains(event.target as Node)) {
         setSortOpen(false);
       }
@@ -124,7 +131,7 @@ export default function ShopContent() {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [openFilter]);
+  }, []);
 
   const toggleFilter = (
     filterType: keyof typeof selectedFilters,
@@ -145,345 +152,290 @@ export default function ShopContent() {
     return selectedFilters[filterType].includes(value);
   };
 
-  const getFrameStyles = () => {
-    switch (selectedFrame) {
-      case "none":
-        return "";
-      case "black":
-        return "ring-1 ring-neutral-800";
-      case "white":
-        return "ring-1 ring-neutral-300";
-    }
+  const resetFilters = () => {
+    setSelectedFilters({
+      collections: [],
+      colorTone: [],
+      orientation: [],
+      size: [],
+    });
+    setPriceRange([20, 500]);
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Pre-filter banner/title content */}
-      <div className="pt-[calc(81px+3rem)] pb-12 md:pt-[calc(81px+5rem)] md:pb-20 px-4 text-center bg-neutral-50">
-        <h1 className="text-3xl md:text-4xl font-light tracking-widest text-neutral-900 uppercase">
-          {t.nav.collections || "COLLECTIONS"}
-        </h1>
-        <p className="text-neutral-500 mt-4 text-sm tracking-wide">
-          Explore our exclusive art prints
-        </p>
+    <div className="min-h-screen bg-neutral-950 pt-[70px]">
+      {/* Header Section */}
+      <div className="border-b border-neutral-800 px-4 py-12 md:py-16">
+        <div className="max-w-[1800px] mx-auto text-center">
+          <h1 className="text-4xl md:text-5xl font-light tracking-widest text-white uppercase">
+            PRINTS
+          </h1>
+          <p className="text-neutral-400 mt-4 text-sm tracking-wide">
+            Museum-quality fine art prints on premium archival paper.
+          </p>
+        </div>
       </div>
 
-      {/* Filters - Clean & Minimal (isolated in its own sticky div) */}
-      <div
-        className="bg-white border-b border-neutral-100 py-4 px-4 sticky top-[70px]"
-        style={{ zIndex: 49 }}
-      >
-        <div className="max-w-[1800px] mx-auto">
-          <div className="flex items-center justify-between">
-            {/* Left: Product count & Filters */}
-            <div className="flex items-center gap-6">
-              <span className="text-xs text-neutral-400 tracking-wide">
-                {products.length} {t.shop.productsCount}
-              </span>
-
-              <div className="h-4 w-px bg-neutral-200" />
-
-              <div className="flex items-center gap-1">
-                {filterOptions.map((filter) => (
-                  <div
-                    key={filter}
-                    className="relative"
-                    ref={(el) => {
-                      filterRefs.current[filter] = el;
-                    }}
-                  >
-                    <button
-                      onClick={() =>
-                        setOpenFilter(openFilter === filter ? null : filter)
-                      }
-                      className={`flex items-center gap-1.5 px-3 py-1.5 text-xs tracking-wide transition-colors cursor-pointer ${
-                        openFilter === filter
-                          ? "text-neutral-900"
-                          : "text-neutral-500 hover:text-neutral-900"
-                      }`}
-                    >
-                      {t.shop.filters[filter]}
-                      <ChevronDown
-                        size={12}
-                        strokeWidth={1.5}
-                        className={`transition-transform ${
-                          openFilter === filter ? "rotate-180" : ""
-                        }`}
-                      />
-                    </button>
-
-                    {openFilter === filter && (
-                      <div className="absolute top-full mt-2 left-0 bg-white border border-neutral-200 shadow-sm py-2 min-w-[180px] z-20">
-                        {filter === "categories" && (
-                          <>
-                            <label className="flex items-center gap-2 px-4 py-2 text-xs text-neutral-600 hover:bg-neutral-50 cursor-pointer transition-colors ">
-                              <input
-                                type="checkbox"
-                                checked={isFilterSelected(
-                                  "categories",
-                                  "botanical",
-                                )}
-                                onChange={() =>
-                                  toggleFilter("categories", "botanical")
-                                }
-                                className="w-4 h-4 rounded border-neutral-300 bg-white accent-neutral-900 focus:ring-neutral-900 cursor-pointer"
-                              />
-                              <span>{t.shop.styleOptions.botanical}</span>
-                            </label>
-                            <label className="flex items-center gap-2 px-4 py-2 text-xs text-neutral-600 hover:bg-neutral-50 cursor-pointer transition-colors">
-                              <input
-                                type="checkbox"
-                                checked={isFilterSelected(
-                                  "categories",
-                                  "stillLife",
-                                )}
-                                onChange={() =>
-                                  toggleFilter("categories", "stillLife")
-                                }
-                                className="w-4 h-4 rounded border-neutral-300 bg-white accent-neutral-900 focus:ring-neutral-900 cursor-pointer"
-                              />
-                              <span>{t.shop.styleOptions.stillLife}</span>
-                            </label>
-                            <label className="flex items-center gap-2 px-4 py-2 text-xs text-neutral-600 hover:bg-neutral-50 cursor-pointer transition-colors">
-                              <input
-                                type="checkbox"
-                                checked={isFilterSelected(
-                                  "categories",
-                                  "portrait",
-                                )}
-                                onChange={() =>
-                                  toggleFilter("categories", "portrait")
-                                }
-                                className="w-4 h-4 rounded border-neutral-300 bg-white accent-neutral-900 focus:ring-neutral-900 cursor-pointer"
-                              />
-                              <span>{t.shop.styleOptions.portrait}</span>
-                            </label>
-                          </>
-                        )}
-
-                        {filter === "size" && (
-                          <>
-                            <label className="flex items-center gap-2 px-4 py-2 text-xs text-neutral-600 hover:bg-neutral-50 cursor-pointer transition-colors">
-                              <input
-                                type="checkbox"
-                                checked={isFilterSelected("size", "small")}
-                                onChange={() => toggleFilter("size", "small")}
-                                className="w-4 h-4 rounded border-neutral-300 bg-white accent-neutral-900 focus:ring-neutral-900 cursor-pointer"
-                              />
-                              <span>{t.shop.sizeOptions.small}</span>
-                            </label>
-                            <label className="flex items-center gap-2 px-4 py-2 text-xs text-neutral-600 hover:bg-neutral-50 cursor-pointer transition-colors">
-                              <input
-                                type="checkbox"
-                                checked={isFilterSelected("size", "medium")}
-                                onChange={() => toggleFilter("size", "medium")}
-                                className="w-4 h-4 rounded border-neutral-300 bg-white accent-neutral-900 focus:ring-neutral-900 cursor-pointer"
-                              />
-                              <span>{t.shop.sizeOptions.medium}</span>
-                            </label>
-                            <label className="flex items-center gap-2 px-4 py-2 text-xs text-neutral-600 hover:bg-neutral-50 cursor-pointer transition-colors">
-                              <input
-                                type="checkbox"
-                                checked={isFilterSelected("size", "large")}
-                                onChange={() => toggleFilter("size", "large")}
-                                className="w-4 h-4 rounded border-neutral-300 bg-white accent-neutral-900 focus:ring-neutral-900 cursor-pointer"
-                              />
-                              <span>{t.shop.sizeOptions.large}</span>
-                            </label>
-                            <label className="flex items-center gap-2 px-4 py-2 text-xs text-neutral-600 hover:bg-neutral-50 cursor-pointer transition-colors">
-                              <input
-                                type="checkbox"
-                                checked={isFilterSelected("size", "xlarge")}
-                                onChange={() => toggleFilter("size", "xlarge")}
-                                className="w-4 h-4 rounded border-neutral-300 bg-white accent-neutral-900 focus:ring-neutral-900 cursor-pointer"
-                              />
-                              <span>{t.shop.sizeOptions.xlarge}</span>
-                            </label>
-                          </>
-                        )}
-                        {filter === "orientation" && (
-                          <>
-                            <label className="flex items-center gap-2 px-4 py-2 text-xs text-neutral-600 hover:bg-neutral-50 cursor-pointer transition-colors">
-                              <input
-                                type="checkbox"
-                                checked={isFilterSelected(
-                                  "orientation",
-                                  "portrait",
-                                )}
-                                onChange={() =>
-                                  toggleFilter("orientation", "portrait")
-                                }
-                                className="w-4 h-4 rounded border-neutral-300 bg-white accent-neutral-900 focus:ring-neutral-900 cursor-pointer"
-                              />
-                              <span>{t.shop.orientationOptions.portrait}</span>
-                            </label>
-                            <label className="flex items-center gap-2 px-4 py-2 text-xs text-neutral-600 hover:bg-neutral-50 cursor-pointer transition-colors">
-                              <input
-                                type="checkbox"
-                                checked={isFilterSelected(
-                                  "orientation",
-                                  "landscape",
-                                )}
-                                onChange={() =>
-                                  toggleFilter("orientation", "landscape")
-                                }
-                                className="w-4 h-4 rounded border-neutral-300 bg-white accent-neutral-900 focus:ring-neutral-900 cursor-pointer"
-                              />
-                              <span>{t.shop.orientationOptions.landscape}</span>
-                            </label>
-                            <label className="flex items-center gap-2 px-4 py-2 text-xs text-neutral-600 hover:bg-neutral-50 cursor-pointer transition-colors">
-                              <input
-                                type="checkbox"
-                                checked={isFilterSelected(
-                                  "orientation",
-                                  "square",
-                                )}
-                                onChange={() =>
-                                  toggleFilter("orientation", "square")
-                                }
-                                className="w-4 h-4 rounded border-neutral-300 bg-white accent-neutral-900 focus:ring-neutral-900 cursor-pointer"
-                              />
-                              <span>{t.shop.orientationOptions.square}</span>
-                            </label>
-                          </>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                ))}
+      {/* Main Content - Sidebar + Grid */}
+      <div className="max-w-[1800px] mx-auto px-4 py-8">
+        <div className="flex gap-8">
+          {/* Sidebar Filters */}
+          <div className="w-56 flex-shrink-0">
+            <div className="sticky top-24">
+              {/* Filter Header */}
+              <div className="flex items-center justify-between mb-8 pb-4 border-b border-neutral-800">
+                <h2 className="text-xs font-semibold tracking-widest text-white uppercase">
+                  FILTERS
+                </h2>
+                <button
+                  onClick={resetFilters}
+                  className="text-xs text-neutral-400 hover:text-neutral-200 transition-colors cursor-pointer"
+                >
+                  Reset all
+                </button>
               </div>
-            </div>
 
-            {/* Right: Frame options & Sort */}
-            <div className="flex items-center gap-6">
-              {/* Framing Options - Minimal */}
-              <div className="flex items-center gap-3">
-                <span className="text-xs text-neutral-400 tracking-wide ">
-                  {t.shop.framing}
-                </span>
-                <div className="flex gap-1.5">
+              {/* Collection Filter */}
+              <div className="mb-8 pb-8 border-b border-neutral-800">
+                <h3 className="text-xs font-semibold tracking-widest text-white uppercase mb-4">
+                  COLLECTION
+                </h3>
+                <div className="space-y-3">
+                  {collections.map((collection) => (
+                    <label
+                      key={collection}
+                      className="flex items-center gap-3 cursor-pointer group"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isFilterSelected("collections", collection)}
+                        onChange={() => toggleFilter("collections", collection)}
+                        className="w-4 h-4 rounded border-neutral-600 bg-neutral-900 accent-neutral-400 cursor-pointer"
+                      />
+                      <span className="text-xs text-neutral-400 group-hover:text-neutral-200 transition-colors">
+                        {collection}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Color Tone Filter */}
+              <div className="mb-8 pb-8 border-b border-neutral-800">
+                <h3 className="text-xs font-semibold tracking-widest text-white uppercase mb-4">
+                  COLOR TONE
+                </h3>
+                <div className="flex flex-wrap gap-3">
+                  {colors.map((color) => (
+                    <button
+                      key={color.name}
+                      onClick={() => toggleFilter("colorTone", color.name)}
+                      className={`w-8 h-8 rounded-full border-2 transition-all cursor-pointer ${
+                        isFilterSelected("colorTone", color.name)
+                          ? "border-neutral-200 ring-2 ring-neutral-600"
+                          : "border-neutral-700 hover:border-neutral-600"
+                      }`}
+                      style={{ backgroundColor: color.color }}
+                      title={color.name}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Orientation Filter */}
+              <div className="mb-8 pb-8 border-b border-neutral-800">
+                <h3 className="text-xs font-semibold tracking-widest text-white uppercase mb-4">
+                  ORIENTATION
+                </h3>
+                <div className="flex gap-3">
                   <button
-                    onClick={() => setSelectedFrame("none")}
-                    className={`w-6 h-6 rounded-full border-2 bg-neutral-50 transition-all ${
-                      selectedFrame === "none"
-                        ? "border-neutral-900"
-                        : "border-neutral-200 hover:border-neutral-400"
+                    onClick={() => toggleFilter("orientation", "portrait")}
+                    className={`flex-1 aspect-[3/4] border-2 rounded transition-all cursor-pointer ${
+                      isFilterSelected("orientation", "portrait")
+                        ? "border-neutral-200 bg-neutral-800"
+                        : "border-neutral-700 hover:border-neutral-600"
                     }`}
-                    title="No frame"
+                    title="Portrait"
                   />
                   <button
-                    onClick={() => setSelectedFrame("black")}
-                    className={`w-6 h-6 rounded-full bg-neutral-900 border-2 transition-all ${
-                      selectedFrame === "black"
-                        ? "border-neutral-900 ring-2 ring-neutral-300"
-                        : "border-neutral-900"
+                    onClick={() => toggleFilter("orientation", "landscape")}
+                    className={`flex-1 aspect-[4/3] border-2 rounded transition-all cursor-pointer ${
+                      isFilterSelected("orientation", "landscape")
+                        ? "border-neutral-200 bg-neutral-800"
+                        : "border-neutral-700 hover:border-neutral-600"
                     }`}
-                    title="Black frame"
+                    title="Landscape"
                   />
                   <button
-                    onClick={() => setSelectedFrame("white")}
-                    className={`w-6 h-6 rounded-full bg-white border-2 transition-all ${
-                      selectedFrame === "white"
-                        ? "border-neutral-400 ring-2 ring-neutral-300"
-                        : "border-neutral-200"
+                    onClick={() => toggleFilter("orientation", "square")}
+                    className={`flex-1 aspect-square border-2 rounded transition-all cursor-pointer ${
+                      isFilterSelected("orientation", "square")
+                        ? "border-neutral-200 bg-neutral-800"
+                        : "border-neutral-700 hover:border-neutral-600"
                     }`}
-                    title="White frame"
+                    title="Square"
                   />
                 </div>
               </div>
 
-              <div className="h-4 w-px bg-neutral-200" />
+              {/* Price Filter */}
+              <div className="mb-8 pb-8 border-b border-neutral-800">
+                <h3 className="text-xs font-semibold tracking-widest text-white uppercase mb-4">
+                  PRICE
+                </h3>
+                <input
+                  type="range"
+                  min="20"
+                  max="500"
+                  value={priceRange[1]}
+                  onChange={(e) =>
+                    setPriceRange([priceRange[0], parseInt(e.target.value)])
+                  }
+                  className="w-full h-1 bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-neutral-400"
+                />
+                <div className="flex justify-between text-xs text-neutral-400 mt-3">
+                  <span>${priceRange[0]}</span>
+                  <span>${priceRange[1]}+</span>
+                </div>
+              </div>
 
-              {/* Sort - Minimal */}
+              {/* Size Filter */}
+              <div>
+                <h3 className="text-xs font-semibold tracking-widest text-white uppercase mb-4">
+                  SIZE
+                </h3>
+                <div className="space-y-3">
+                  {sizes.map((size) => (
+                    <label
+                      key={size}
+                      className="flex items-center gap-3 cursor-pointer group"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isFilterSelected("size", size)}
+                        onChange={() => toggleFilter("size", size)}
+                        className="w-4 h-4 rounded border-neutral-600 bg-neutral-900 accent-neutral-400 cursor-pointer"
+                      />
+                      <span className="text-xs text-neutral-400 group-hover:text-neutral-200 transition-colors">
+                        {size}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Content Area */}
+          <div className="flex-1">
+            {/* Top Bar with Sort */}
+            <div className="flex items-center justify-between mb-8 pb-4 border-b border-neutral-800">
+              <span className="text-xs text-neutral-400 tracking-wide">
+                {products.length} products
+              </span>
+
               <div className="relative" ref={sortRef}>
                 <button
                   onClick={() => setSortOpen(!sortOpen)}
-                  className="flex items-center gap-1.5 text-xs text-neutral-500 hover:text-neutral-900 tracking-wide transition-colors cursor-pointer"
+                  className="flex items-center gap-2 text-xs text-neutral-400 hover:text-neutral-200 tracking-wide transition-colors cursor-pointer"
                 >
-                  {t.shop.sort}
+                  Sort by
                   <ChevronDown
                     size={12}
                     strokeWidth={1.5}
-                    className={`transition-transform ${
-                      sortOpen ? "rotate-180" : ""
-                    }`}
+                    className={`transition-transform ${sortOpen ? "rotate-180" : ""}`}
                   />
                 </button>
 
                 {sortOpen && (
-                  <div className="absolute top-full mt-2 right-0 bg-white border border-neutral-200 shadow-sm py-1 min-w-[160px] z-20 ">
-                    <button className="w-full px-4 py-2 text-left text-xs text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900 transition-colors cursor-pointer">
-                      {t.shop.sortOptions.featured}
+                  <div className="absolute top-full mt-2 right-0 bg-neutral-900 border border-neutral-700 shadow-lg py-1 min-w-[160px] z-20">
+                    <button className="w-full px-4 py-2 text-left text-xs text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200 transition-colors cursor-pointer">
+                      Featured
                     </button>
-                    <button className="w-full px-4 py-2 text-left text-xs text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900 transition-colors cursor-pointer">
-                      {t.shop.sortOptions.newest}
+                    <button className="w-full px-4 py-2 text-left text-xs text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200 transition-colors cursor-pointer">
+                      Newest
                     </button>
-                    <button className="w-full px-4 py-2 text-left text-xs text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900 transition-colors cursor-pointer">
-                      {t.shop.sortOptions.priceLow}
+                    <button className="w-full px-4 py-2 text-left text-xs text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200 transition-colors cursor-pointer">
+                      Price: Low to High
                     </button>
-                    <button className="w-full px-4 py-2 text-left text-xs text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900 transition-colors cursor-pointer">
-                      {t.shop.sortOptions.priceHigh}
+                    <button className="w-full px-4 py-2 text-left text-xs text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200 transition-colors cursor-pointer">
+                      Price: High to Low
                     </button>
                   </div>
                 )}
               </div>
             </div>
+
+            {/* Product Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {products.map((product) => (
+                <div key={product.id} className="group cursor-pointer">
+                  <Link href={`/products/${product.id}`} className="block">
+                    {/* Product Image with Hover Heart */}
+                    <div className="relative aspect-[3/4] overflow-hidden bg-neutral-900 mb-4 group">
+                      <Image
+                        src={product.image || "/placeholder.svg"}
+                        alt={product.name}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <button className="absolute top-3 right-3 p-2 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer hover:bg-black/60">
+                        <Heart
+                          size={16}
+                          className="text-white"
+                          strokeWidth={1.5}
+                        />
+                      </button>
+                    </div>
+
+                    {/* Product Info */}
+                    <div className="text-center">
+                      <div className="flex items-center justify-center gap-2 mb-2">
+                        <span className="text-sm text-white font-light">
+                          ${product.price}
+                        </span>
+                        <span className="text-xs text-neutral-500 line-through">
+                          ${product.originalPrice}
+                        </span>
+                      </div>
+                      <p className="text-xs text-neutral-400">{product.name}</p>
+                    </div>
+                  </Link>
+                </div>
+              ))}
+            </div>
+
+            {/* Pagination */}
+            <div className="mt-16 pt-8 border-t border-neutral-800 flex items-center justify-center gap-2">
+              <button className="w-10 h-10 rounded border border-neutral-700 text-neutral-400 hover:border-neutral-300 hover:text-white transition-colors text-sm cursor-pointer">
+                {"<"}
+              </button>
+              <button className="w-10 h-10 rounded border border-neutral-300 bg-neutral-800 text-white font-light text-sm cursor-pointer">
+                1
+              </button>
+              <button className="w-10 h-10 rounded border border-neutral-700 text-neutral-400 hover:border-neutral-300 hover:text-white transition-colors text-sm cursor-pointer">
+                2
+              </button>
+              <button className="w-10 h-10 rounded border border-neutral-700 text-neutral-400 hover:border-neutral-300 hover:text-white transition-colors text-sm cursor-pointer">
+                3
+              </button>
+              <span className="text-neutral-500 text-sm">...</span>
+              <button className="w-10 h-10 rounded border border-neutral-700 text-neutral-400 hover:border-neutral-300 hover:text-white transition-colors text-sm cursor-pointer">
+                8
+              </button>
+              <button className="w-10 h-10 rounded border border-neutral-700 text-neutral-400 hover:border-neutral-300 hover:text-white transition-colors text-sm cursor-pointer">
+                {">"}
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Product Grid - 4 columns, clean spacing */}
-      <div className="max-w-[1800px] mx-auto px-3 pb-16 pt-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-20 gap-y-12">
-          {products.map((product) => (
-            <Link
-              key={product.id}
-              href={`/products/${product.id}`}
-              className="cursor-pointer"
-            >
-              {/* Product Image - Clean, minimal */}
-              <div className="relative mb-5">
-                <div
-                  className={`relative aspect-[3/4] overflow-hidden bg-neutral-100 ${getFrameStyles()} transition-all duration-500`}
-                >
-                  <Image
-                    src={product.image || "/placeholder.svg"}
-                    alt={product.name}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              </div>
-
-              {/* Product Info - Price only */}
-              <div className="text-center">
-                <div className="flex items-center justify-center gap-2">
-                  <span className="text-sm text-neutral-900">
-                    ${product.price}
-                  </span>
-                  <span className="text-xs text-neutral-400 line-through">
-                    ${product.originalPrice}
-                  </span>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div>
-
-      {/* Load More - Minimal button */}
-      <div className="text-center pb-16">
-        <button className="text-xs tracking-[0.2em] uppercase text-neutral-500 hover:text-neutral-900 transition-colors border-b border-neutral-300 hover:border-neutral-900 pb-1">
-          Load more
-        </button>
-      </div>
-
       {/* Click outside to close dropdowns */}
-      {(openFilter || sortOpen) && (
+      {sortOpen && (
         <div
           className="fixed inset-0 z-10"
           onClick={() => {
-            setOpenFilter(null);
             setSortOpen(false);
           }}
         />

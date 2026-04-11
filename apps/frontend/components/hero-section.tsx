@@ -3,12 +3,13 @@
 import { ArrowDown } from "lucide-react";
 import { useLanguage } from "@/lib/language-context";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export function HeroSection() {
   const { t } = useLanguage();
 
   return (
-    <section className="relative min-h-screen flex items-center pt-24 md:pt-32 px-6 overflow-hidden">
+    <section className="relative min-h-screen flex items-start pt-40 md:pt-48 px-6 overflow-hidden">
       {/* Video Background */}
       <video
         autoPlay
@@ -34,11 +35,10 @@ export function HeroSection() {
           </p>
 
           <div>
-            <Link
-              href="/collections"
-              className="inline-block border border-foreground bg-foreground px-8 py-3 text-sm tracking-widest text-background hover:bg-background hover:text-foreground transition-all duration-300 uppercase"
-            >
-              SHOP THE COLLECTION
+            <Link href="/collections">
+              <Button variant="primary" size="lg" className="font-semibold">
+                SHOP THE COLLECTION
+              </Button>
             </Link>
           </div>
         </div>

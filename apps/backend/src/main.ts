@@ -20,7 +20,7 @@ async function bootstrap() {
     origin:
       process.env.NODE_ENV === 'production'
         ? ['https://your-frontend-domain.com']
-        : ['http://localhost:3000'],
+        : true, // Allow all localhost in development
     credentials: true,
   });
 

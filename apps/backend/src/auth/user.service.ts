@@ -7,6 +7,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import {
   UpdatePasswordDto,
+  UpdateProfileDto,
   AddTelephoneDto,
   UpdateTelephoneDto,
   AddAddressDto,
@@ -83,6 +84,46 @@ export class UserService {
       statusCode: 200,
       success: true,
       message: 'Password updated successfully',
+    };
+  }
+
+  async updateProfile(userId: number, updateProfileDto: UpdateProfileDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Update firstName and/or lastName
+    const updateData: any = {};
+    if (updateProfileDto.firstName !== undefined) {
+      updateData.firstName = updateProfileDto.firstName;
+    }
+    if (updateProfileDto.lastName !== undefined) {
+      updateData.lastName = updateProfileDto.lastName;
+    }
+
+    const updatedUser = await this.prisma.user.update({
+      where: { id: userId },
+      data: updateData,
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        isActive: true,
+        updatedAt: true,
+      },
+    });
+
+    return {
+      statusCode: 200,
+      success: true,
+      message: 'Profile updated successfully',
+      data: updatedUser,
     };
   }
 
