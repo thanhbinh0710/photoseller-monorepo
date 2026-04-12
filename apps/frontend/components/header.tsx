@@ -165,7 +165,7 @@ export function Header() {
               }`}
             >
               <span
-                className={`inline-block transition-all duration-300 ease-out pb-1 ${
+                className={`inline-block transition-all duration-300 ease-out ${
                   pathname === "/collections"
                     ? "border-b-2 border-foreground"
                     : "border-b-2 border-transparent hover:border-foreground"
@@ -182,7 +182,7 @@ export function Header() {
               }`}
             >
               <span
-                className={`inline-block transition-all duration-300 ease-out pb-1 ${
+                className={`inline-block transition-all duration-300 ease-out ${
                   pathname === "/about"
                     ? "border-b-2 border-foreground"
                     : "border-b-2 border-transparent hover:border-foreground"
@@ -195,7 +195,7 @@ export function Header() {
               href="#contact"
               className="text-base text-foreground transition-all duration-300 ease-out cursor-pointer"
             >
-              <span className="inline-block transition-all duration-300 ease-out pb-1 border-b-2 border-transparent hover:border-foreground">
+              <span className="inline-block transition-all duration-300 ease-out border-b-2 border-transparent hover:border-foreground">
                 {t.nav.contact}
               </span>
             </Link>
