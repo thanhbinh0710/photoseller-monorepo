@@ -58,7 +58,7 @@ pnpm install
 
 Backend (`apps/backend/.env`):
 ```bash
-DATABASE_URL="mysql://user:password@localhost:3306/photoseller"
+DATABASE_URL="mysql://photoseller:photoseller@localhost:3306/photoseller"
 JWT_SECRET="your-secret-key"
 JWT_EXPIRATION="24h"
 ```
@@ -78,7 +78,13 @@ docker-compose up -d
 ### 4. Chạy các migration cơ sở dữ liệu
 
 ```bash
-pnpm -F backend db:migrate
+pnpm -F backend prisma:migrate:deploy
+```
+
+### 4a. (Tùy chọn) Seed cơ sở dữ liệu với dữ liệu mẫu
+
+```bash
+pnpm -F backend db:seed
 ```
 
 ### 5. Khởi động các máy chủ phát triển
@@ -88,8 +94,9 @@ pnpm dev
 ```
 
 Cách này sẽ khởi động:
-- Frontend trên `http://localhost:3001`
-- Backend API trên `http://localhost:3000`
+- Frontend trên `http://localhost:3000`
+- Backend API trên `http://localhost:8000`
+- Swagger API Documentation trên `http://localhost:8000/api`
 
 ## Cơ Cấu Dự Án
 
@@ -154,8 +161,11 @@ pnpm check-format
 ### Cơ Sở Dữ Liệu
 
 ```bash
+# Tạo Prisma client
+pnpm -F backend prisma:generate
+
 # Chạy migration
-pnpm -F backend db:migrate
+pnpm -F backend prisma:migrate:deploy
 
 # Seed cơ sở dữ liệu
 pnpm -F backend db:seed
