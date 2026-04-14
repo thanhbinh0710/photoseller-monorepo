@@ -139,7 +139,7 @@ export function Header() {
           ? "bg-transparent border-b border-transparent"
           : isNearHeroEnd
             ? "bg-transparent border-b border-transparent"
-            : "border-b border-primary-600 bg-background"
+            : "border-b border-primary-600 bg-primary-950"
       }`}
     >
       <div className="max-w-[1800px] mx-auto px-3 w-full h-full flex items-center">

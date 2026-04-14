@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
+import { useLanguage } from "@/lib/language-context";
 
 interface Notification {
   id: string;

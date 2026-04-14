@@ -5,6 +5,7 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useLanguage } from "@/lib/language-context";
 
 export function PreferencesTab() {
   const [preferences, setPreferences] = useState({

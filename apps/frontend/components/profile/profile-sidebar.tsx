@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/accordion";
 import clsx from "clsx";
 import { useFetchUserProfile } from "@/lib/hooks/useFetchUserProfile";
+import { useLanguage } from "@/lib/language-context";
 
 interface ProfileSidebarProps {
   activeTab: string;
@@ -28,6 +29,7 @@ export function ProfileSidebar({
 }: ProfileSidebarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { userProfile } = useFetchUserProfile();
+  const { t } = useLanguage();
 
   // Use fetched data if userInfo prop is not provided
   const displayUserInfo = userInfo || userProfile;
@@ -35,29 +37,29 @@ export function ProfileSidebar({
   const menuItems = [
     {
       key: "account",
-      label: "Thông tin tài khoản",
+      label: t.profile.sidebar.accountInfo,
       icon: <User size={18} />,
       children: [
         {
           key: "profile",
-          label: "Hồ sơ cá nhân",
+          label: t.profile.sidebar.personalProfile,
           icon: <User size={16} />,
         },
         {
           key: "addresses",
-          label: "Sổ địa chỉ",
+          label: t.profile.sidebar.addressBook,
           icon: <MapPin size={16} />,
         },
         {
           key: "password",
-          label: "Đổi mật khẩu",
+          label: t.profile.sidebar.changePassword,
           icon: <Lock size={16} />,
         },
       ],
     },
     {
       key: "orders",
-      label: "Đơn hàng của tôi",
+      label: t.profile.sidebar.myOrders,
       icon: <Package size={18} />,
     },
   ];
@@ -102,7 +104,6 @@ export function ProfileSidebar({
                 ? `${displayUserInfo.firstName || ""} ${displayUserInfo.lastName || ""}`.trim()
                 : "User"}
             </h3>
-            <p className="text-xs text-neutral-400">Thành viên</p>
           </div>
         </div>
 
@@ -112,7 +113,7 @@ export function ProfileSidebar({
             <div key={item.key}>
               {item.children ? (
                 <AccordionItem value={item.key}>
-                  <AccordionTrigger className="text-white font-medium hover:text-neutral-300">
+                  <AccordionTrigger className="font-medium ">
                     <span className="flex items-center gap-2">
                       {item.icon}
                       <span className="text-sm">{item.label}</span>
@@ -127,8 +128,8 @@ export function ProfileSidebar({
                           className={clsx(
                             "w-full flex items-center gap-2 px-3 py-2 text-sm rounded transition-colors cursor-pointer",
                             activeTab === child.key
-                              ? "bg-neutral-800 text-white border-l-2 border-amber-100"
-                              : "text-neutral-400 hover:text-white hover:bg-neutral-800",
+                              ? "bg-neutral-800 text-secondary-200 "
+                              : "text-neutral-400 hover:bg-neutral-800",
                           )}
                         >
                           {child.icon}
@@ -144,8 +145,8 @@ export function ProfileSidebar({
                   className={clsx(
                     "w-full flex items-center gap-2 px-3 py-2 text-sm rounded transition-colors cursor-pointer",
                     activeTab === item.key
-                      ? "bg-neutral-800 text-white border-l-2 border-amber-100"
-                      : "text-neutral-400 hover:text-white hover:bg-neutral-800",
+                      ? "bg-neutral-800 text-secondary-200 "
+                      : "text-neutral-400 hover:bg-neutral-800",
                   )}
                 >
                   {item.icon}
