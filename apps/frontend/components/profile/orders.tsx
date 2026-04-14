@@ -3,7 +3,15 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ShoppingBag, Eye } from "lucide-react";
+import {
+  IconClock,
+  IconRefresh,
+  IconPackage,
+  IconCheck,
+  IconX,
+} from "@tabler/icons-react";
 import Link from "next/link";
+import { useLanguage } from "@/lib/language-context";
 
 interface Order {
   id: string;
@@ -18,24 +26,41 @@ interface OrdersProps {
 }
 
 export function Orders({ orders }: OrdersProps) {
-  const getStatusVariant = (status: string) => {
-    const statusMap: Record<string, string> = {
-      pending: "bg-orange-100 text-orange-900",
-      processing: "bg-blue-100 text-blue-900",
-      shipped: "bg-purple-100 text-purple-900",
-      delivered: "bg-green-100 text-green-900",
-      cancelled: "bg-red-100 text-red-900",
+  const { t } = useLanguage();
+  const getStatusVariant = (
+    status: string,
+  ): "pending" | "processing" | "shipped" | "delivered" | "cancelled" => {
+    const statusMap: Record<
+      string,
+      "pending" | "processing" | "shipped" | "delivered" | "cancelled"
+    > = {
+      pending: "pending",
+      processing: "processing",
+      shipped: "shipped",
+      delivered: "delivered",
+      cancelled: "cancelled",
     };
-    return statusMap[status] || "bg-neutral-700 text-white";
+    return statusMap[status] || "pending";
+  };
+
+  const getStatusIcon = (status: string) => {
+    const iconMap: Record<string, React.ReactNode> = {
+      pending: <IconClock size={14} />,
+      processing: <IconRefresh size={14} />,
+      shipped: <IconPackage size={14} />,
+      delivered: <IconCheck size={14} />,
+      cancelled: <IconX size={14} />,
+    };
+    return iconMap[status] || <IconClock size={14} />;
   };
 
   const getStatusLabel = (status: string) => {
     const labelMap: Record<string, string> = {
-      pending: "Chờ xác nhận",
-      processing: "Đang xử lý",
-      shipped: "Đã gửi",
-      delivered: "Đã giao",
-      cancelled: "Đã hủy",
+      pending: t.profile.orders.statusPending,
+      processing: t.profile.orders.statusProcessing,
+      shipped: t.profile.orders.statusShipped,
+      delivered: t.profile.orders.statusDelivered,
+      cancelled: t.profile.orders.statusCancelled,
     };
     return labelMap[status] || status;
   };
@@ -62,6 +87,27 @@ export function Orders({ orders }: OrdersProps) {
       status: "delivered",
       items: 4,
     },
+    {
+      id: "ORD004",
+      date: "2025-04-12",
+      total: 1500000,
+      status: "pending",
+      items: 1,
+    },
+    {
+      id: "ORD005",
+      date: "2025-04-10",
+      total: 4200000,
+      status: "processing",
+      items: 5,
+    },
+    {
+      id: "ORD006",
+      date: "2025-03-15",
+      total: 950000,
+      status: "cancelled",
+      items: 1,
+    },
   ];
 
   const displayOrders = orders && orders.length > 0 ? orders : dummyOrders;
@@ -70,14 +116,12 @@ export function Orders({ orders }: OrdersProps) {
     return (
       <div className="bg-neutral-900 rounded-lg shadow-sm p-8 border border-neutral-700">
         <h2 className="text-2xl font-semibold text-white mb-6">
-          Đơn hàng của tôi
+          {t.profile.orders.title}
         </h2>
         <div className="text-center py-8">
-          <p className="text-neutral-400 mb-4">Bạn chưa có đơn hàng nào</p>
+          <p className="text-neutral-400 mb-4">{t.profile.orders.noOrders}</p>
           <Link href="/collections">
-            <button className="bg-amber-100 text-black px-6 py-2 rounded cursor-pointer hover:bg-amber-200">
-              Mua sắm ngay
-            </button>
+            <Button>{t.profile.orders.shopNow}</Button>
           </Link>
         </div>
       </div>
@@ -87,7 +131,7 @@ export function Orders({ orders }: OrdersProps) {
   return (
     <div className="bg-neutral-900 rounded-lg shadow-sm p-8 border border-neutral-700">
       <h2 className="text-2xl font-semibold text-white mb-6">
-        Đơn hàng của tôi
+        {t.profile.orders.title}
       </h2>
 
       <div className="space-y-4">
@@ -107,17 +151,21 @@ export function Orders({ orders }: OrdersProps) {
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                   <div>
-                    <p className="text-neutral-400">Ngày đặt</p>
+                    <p className="text-neutral-400">
+                      {t.profile.orders.orderDate}
+                    </p>
                     <p className="font-medium text-neutral-100">{order.date}</p>
                   </div>
                   <div>
-                    <p className="text-neutral-400">Số lượng</p>
+                    <p className="text-neutral-400">
+                      {t.profile.orders.quantity}
+                    </p>
                     <p className="font-medium text-neutral-100">
-                      {order.items} sản phẩm
+                      {order.items} {t.profile.orders.items}
                     </p>
                   </div>
                   <div>
-                    <p className="text-neutral-400">Tổng tiền</p>
+                    <p className="text-neutral-400">{t.profile.orders.total}</p>
                     <p className="font-medium text-neutral-100">
                       {new Intl.NumberFormat("vi-VN", {
                         style: "currency",
@@ -130,17 +178,13 @@ export function Orders({ orders }: OrdersProps) {
 
               {/* Status & Action */}
               <div className="flex flex-col items-start md:items-end gap-3">
-                <span
-                  className={`px-4 py-2 text-xs font-semibold rounded ${getStatusVariant(order.status)}`}
+                <Badge
+                  variant={getStatusVariant(order.status)}
+                  className="flex items-center gap-1"
                 >
+                  {getStatusIcon(order.status)}
                   {getStatusLabel(order.status)}
-                </span>
-                <Link href={`/profile/orders/${order.id}`}>
-                  <button className="flex items-center gap-2 text-sm text-amber-100 hover:text-amber-200 transition-colors cursor-pointer">
-                    <Eye size={16} />
-                    Xem chi tiết
-                  </button>
-                </Link>
+                </Badge>
               </div>
             </div>
           </div>

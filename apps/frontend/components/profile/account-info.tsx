@@ -55,15 +55,15 @@ export function AccountInfo({
     const newErrors: Partial<UserAccountInfo> = {};
 
     if (!formData.firstName) {
-      newErrors.firstName = "Vui lòng nhập họ";
+      newErrors.firstName = t.profile.accountInfo.errorFirstName;
     }
 
     if (!formData.lastName) {
-      newErrors.lastName = "Vui lòng nhập tên";
+      newErrors.lastName = t.profile.accountInfo.errorLastName;
     }
 
     if (!formData.phone) {
-      newErrors.phone = "Vui lòng nhập số điện thoại";
+      newErrors.phone = t.profile.accountInfo.errorPhone;
     }
 
     setErrors(newErrors);
@@ -155,10 +155,12 @@ export function AccountInfo({
       if (onSave) {
         await onSave(formData);
       }
-      toast.success("Thông tin đã được lưu");
+      toast.success(t.profile.accountInfo.successMessage);
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Lỗi khi lưu thông tin",
+        error instanceof Error
+          ? error.message
+          : t.profile.accountInfo.errorMessage,
       );
     } finally {
       setIsSaving(false);
@@ -167,14 +169,16 @@ export function AccountInfo({
 
   return (
     <div className="bg-neutral-900 rounded-lg shadow-sm p-8 border border-neutral-700">
-      <h2 className="text-2xl font-semibold text-white mb-6">Hồ sơ cá nhân</h2>
+      <h2 className="text-2xl font-semibold text-white mb-6">
+        {t.profile.accountInfo.title}
+      </h2>
 
       <form onSubmit={handleSave} className="max-w-2xl">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* First Name */}
           <div>
             <label className="block text-sm font-medium text-neutral-300 mb-2">
-              Họ
+              {t.profile.accountInfo.firstNameLabel}
             </label>
             <Input
               value={formData.firstName}
@@ -187,7 +191,7 @@ export function AccountInfo({
               className={`bg-neutral-800 border-neutral-700 text-white placeholder-neutral-500 ${
                 errors.firstName ? "border-red-500" : ""
               }`}
-              placeholder="Nhập họ"
+              placeholder={t.profile.accountInfo.firstNameLabel}
               disabled={isSaving || externalLoading || isLoadingData}
             />
             {errors.firstName && (
@@ -198,7 +202,7 @@ export function AccountInfo({
           {/* Last Name */}
           <div>
             <label className="block text-sm font-medium text-neutral-300 mb-2">
-              Tên
+              {t.profile.accountInfo.lastNameLabel}
             </label>
             <Input
               value={formData.lastName}
@@ -211,7 +215,7 @@ export function AccountInfo({
               className={`bg-neutral-800 border-neutral-700 text-white placeholder-neutral-500 ${
                 errors.lastName ? "border-red-500" : ""
               }`}
-              placeholder="Nhập tên"
+              placeholder={t.profile.accountInfo.lastNameLabel}
               disabled={isSaving || externalLoading || isLoadingData}
             />
             {errors.lastName && (
@@ -223,7 +227,7 @@ export function AccountInfo({
         {/* Phone */}
         <div className="mt-6">
           <label className="block text-sm font-medium text-neutral-300 mb-2">
-            Số điện thoại
+            {t.profile.accountInfo.phoneLabel}
           </label>
           <Input
             value={formData.phone}
@@ -236,7 +240,7 @@ export function AccountInfo({
             className={`bg-neutral-800 border-neutral-700 text-white placeholder-neutral-500 ${
               errors.phone ? "border-red-500" : ""
             }`}
-            placeholder="Nhập số điện thoại"
+            placeholder={t.profile.accountInfo.phoneLabel}
             disabled={isSaving || externalLoading || isLoadingData}
           />
           {errors.phone && (
@@ -247,7 +251,7 @@ export function AccountInfo({
         {/* Email */}
         <div className="mt-6">
           <label className="block text-sm font-medium text-neutral-300 mb-2">
-            Email
+            {t.profile.accountInfo.emailLabel}
           </label>
           <Input
             type="email"
@@ -259,16 +263,16 @@ export function AccountInfo({
 
         {/* Action Buttons */}
         <div className="flex gap-4 mt-8">
-          <button
+          <Button
             type="submit"
+            variant="save"
             disabled={isSaving || externalLoading || isLoadingData}
-            className="bg-amber-100 text-black px-6 py-2 rounded font-semibold hover:bg-amber-200 transition-colors disabled:opacity-50 cursor-pointer"
           >
             {isSaving || externalLoading || isLoadingData
-              ? "Đang lưu..."
-              : "Lưu thông tin"}
-          </button>
-          <button
+              ? t.profile.accountInfo.saveButton + "..."
+              : t.profile.accountInfo.saveButton}
+          </Button>
+          <Button
             type="button"
             onClick={() => {
               // Reset về data từ API
@@ -281,10 +285,10 @@ export function AccountInfo({
               setErrors({});
             }}
             disabled={isSaving || externalLoading || isLoadingData}
-            className="border border-neutral-700 text-neutral-300 px-6 py-2 rounded hover:bg-neutral-800 transition-colors disabled:opacity-50 cursor-pointer"
+            variant="cancel"
           >
             Hủy
-          </button>
+          </Button>
         </div>
       </form>
     </div>

@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useLanguage } from "@/lib/language-context";
 
 interface Address {
   id: string;
@@ -29,6 +30,7 @@ export function Addresses({
   onAddAddress,
   onDeleteAddress,
 }: AddressesProps) {
+  const { t } = useLanguage();
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [formErrors, setFormErrors] = useState<Partial<Address>>({});
   const [formData, setFormData] = useState<Partial<Address>>({
@@ -60,23 +62,23 @@ export function Addresses({
     const newErrors: Partial<Address> = {};
 
     if (!formData.name) {
-      newErrors.name = "Vui lòng nhập tên địa chỉ";
+      newErrors.name = t.profile.addresses.addressName;
     }
 
     if (!formData.phone) {
-      newErrors.phone = "Vui lòng nhập số điện thoại";
+      newErrors.phone = t.profile.addresses.phoneNumber;
     }
 
     if (!formData.city) {
-      newErrors.city = "Vui lòng nhập thành phố/tỉnh";
+      newErrors.city = t.profile.addresses.city;
     }
 
     if (!formData.district) {
-      newErrors.district = "Vui lòng nhập quận/huyện";
+      newErrors.district = t.profile.addresses.district;
     }
 
     if (!formData.ward) {
-      newErrors.ward = "Vui lòng nhập phường/xã";
+      newErrors.ward = t.profile.addresses.ward;
     }
 
     setFormErrors(newErrors);
@@ -113,7 +115,7 @@ export function Addresses({
     });
     setFormErrors({});
     setIsFormVisible(false);
-    toast.success("Địa chỉ đã được thêm");
+    toast.success(t.profile.addresses.successMessage);
   };
 
   const FormField = ({
@@ -150,46 +152,45 @@ export function Addresses({
   return (
     <div className="bg-neutral-900 rounded-lg shadow-sm p-8 border border-neutral-700">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold text-white">Địa chỉ</h2>
+        <h2 className="text-2xl font-semibold text-white">
+          {t.profile.addresses.title}
+        </h2>
         {!isFormVisible && (
-          <button
-            onClick={() => setIsFormVisible(true)}
-            className="flex items-center gap-2 bg-amber-100 text-black px-4 py-2 rounded cursor-pointer hover:bg-amber-200"
-          >
+          <Button variant="save" onClick={() => setIsFormVisible(true)}>
             <Plus size={16} />
-            Thêm địa chỉ
-          </button>
+            {t.profile.addresses.addNew}
+          </Button>
         )}
       </div>
 
       {isFormVisible && (
-        <div className="mb-6 border border-neutral-700 bg-neutral-800 p-6 rounded-lg">
+        <div className="mb-6 bg-neutral-800 p-6 rounded-lg">
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
-                label="Tên địa chỉ"
+                label={t.profile.addresses.addressName}
                 name="name"
                 value={formData.name}
                 onChange={(value) =>
                   setFormData((prev) => ({ ...prev, name: value }))
                 }
-                placeholder="VD: Nhà riêng, Công ty..."
+                placeholder={t.profile.addresses.addressNamePlaceholder}
                 error={formErrors.name}
               />
 
               <FormField
-                label="Số điện thoại"
+                label={t.profile.addresses.phoneNumber}
                 name="phone"
                 value={formData.phone}
                 onChange={(value) =>
                   setFormData((prev) => ({ ...prev, phone: value }))
                 }
-                placeholder="090xxx"
+                placeholder={t.profile.addresses.phoneNumberPlaceholder}
                 error={formErrors.phone}
               />
 
               <FormField
-                label="Thành phố/Tỉnh"
+                label={t.profile.addresses.city}
                 name="city"
                 value={formData.city}
                 onChange={(value) =>
@@ -199,7 +200,7 @@ export function Addresses({
               />
 
               <FormField
-                label="Quận/Huyện"
+                label={t.profile.addresses.district}
                 name="district"
                 value={formData.district}
                 onChange={(value) =>
@@ -209,7 +210,37 @@ export function Addresses({
               />
 
               <FormField
-                label="Phường/Xã"
+                label={t.profile.addresses.ward}
+                name="ward"
+                value={formData.ward}
+                onChange={(value) =>
+                  setFormData((prev) => ({ ...prev, ward: value }))
+                }
+                error={formErrors.ward}
+              />
+
+              <FormField
+                label={t.profile.addresses.address}
+                name="address"
+                value={formData.address}
+                onChange={(value) =>
+                  setFormData((prev) => ({ ...prev, address: value }))
+                }
+                error={formErrors.city}
+              />
+
+              <FormField
+                label={t.profile.addresses.district}
+                name="district"
+                value={formData.district}
+                onChange={(value) =>
+                  setFormData((prev) => ({ ...prev, district: value }))
+                }
+                error={formErrors.district}
+              />
+
+              <FormField
+                label={t.profile.addresses.ward}
                 name="ward"
                 value={formData.ward}
                 onChange={(value) =>
@@ -229,15 +260,12 @@ export function Addresses({
             </div>
 
             <div className="flex gap-2 mt-6">
-              <button
-                type="submit"
-                className="bg-amber-100 text-black px-6 py-2 rounded cursor-pointer hover:bg-amber-200"
-              >
+              <Button type="submit" variant="save">
                 Lưu địa chỉ
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
-                className="border border-neutral-700 text-neutral-300 px-6 py-2 rounded hover:bg-neutral-800 cursor-pointer"
+                variant="cancel"
                 onClick={() => {
                   setIsFormVisible(false);
                   setFormData({
@@ -252,7 +280,7 @@ export function Addresses({
                 }}
               >
                 Hủy
-              </button>
+              </Button>
             </div>
           </form>
         </div>
@@ -267,10 +295,8 @@ export function Addresses({
           {displayAddresses.map((address) => (
             <div
               key={address.id}
-              className={`border p-6 rounded-lg ${
-                address.isDefault
-                  ? "border-amber-500 bg-neutral-800"
-                  : "border-neutral-700 bg-neutral-800"
+              className={`border border-neutral-700 p-6 rounded-lg ${
+                address.isDefault ? "bg-neutral-800" : "bg-neutral-800"
               }`}
             >
               <div className="flex justify-between items-start">
