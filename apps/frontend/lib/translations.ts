@@ -12,8 +12,9 @@ export const translations = {
     },
     // Hero
     hero: {
-      title1: "Gathering the Fragments of",
-      title2: "A Lifetime",
+      titleBefore: "Gathering the ",
+      titleHighlight: "Fragments",
+      titleAfter: "of a\nLifetime",
       description:
         "Where I condense the beauty of every moment into photographs.",
       cta: "EXPLORE COLLECTION",
@@ -315,10 +316,11 @@ export const translations = {
     },
     // Hero
     hero: {
-      title1: "Gom Nhặt Từng Phút Giây",
-      title2: "Bên Đời",
+      titleBefore: "Gom Nhặt Từng ",
+      titleHighlight: "Phút Giây",
+      titleAfter: "Bên Đời",
       description:
-        "Nơi tôi cô đọng vẻ đẹp của từng khoảng khắc vào những bức hình.",
+        "Nơi tôi cô đọng vẻ đẽp của từng khoảng khắc vào những bức hình.",
       cta: "KHÁM PHÁ NGAY",
     },
     // Featured Gallery

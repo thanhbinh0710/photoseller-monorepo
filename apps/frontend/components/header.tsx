@@ -75,15 +75,7 @@ export function Header() {
   };
 
   return (
-    <div
-      className={`fixed top-0 left-0 right-0 z-50 flex items-center h-[70px] transition-all duration-300 ${
-        isInHero
-          ? "bg-transparent border-b border-transparent"
-          : isNearHeroEnd
-            ? "bg-transparent border-b border-transparent"
-            : "border-b border-primary-900 bg-background/80 backdrop-blur-lg"
-      }`}
-    >
+    <div className="fixed top-0 left-0 right-0 z-50 flex items-center h-[70px] bg-background">
       <div className="max-w-[1800px] mx-auto px-3 w-full h-full flex items-center">
         <nav className="flex items-center justify-between font-semibold w-full">
           <Link href="/">
@@ -97,7 +89,7 @@ export function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-10 font-normal">
+          <div className="hidden md:flex items-center gap-10 font-medium">
             <Link
               href="/collections"
               className={`text-base transition-all duration-300 ease-out cursor-pointer group ${

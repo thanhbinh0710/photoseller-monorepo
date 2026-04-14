@@ -119,7 +119,10 @@ export function FeaturedGallery() {
   };
 
   return (
-    <section id="gallery" className="py-24 md:py-32 bg-[#05090c]">
+    <section
+      id="gallery"
+      className="py-28 md:py-36 bg-[#05090c] my-12 md:my-20"
+    >
       <div className="max-w-6xl mx-auto px-6">
         <div className="text-center mb-16">
           <p className="text-xs tracking-widest text-muted-foreground mb-4 uppercase">

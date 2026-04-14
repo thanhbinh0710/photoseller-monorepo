@@ -22,7 +22,10 @@ export function NewsletterSection() {
   };
 
   return (
-    <section id="contact" className="py-24 md:py-32 px-6 bg-[#05090c]">
+    <section
+      id="contact"
+      className="py-28 md:py-36 px-6 bg-[#05090c] my-12 md:my-20"
+    >
       <div className="max-w-xl mx-auto text-center">
         <p className="text-xs tracking-widest text-muted-foreground mb-4 uppercase">
           {t.newsletter.subtitle}

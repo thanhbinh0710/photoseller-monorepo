@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useLanguage } from "@/lib/language-context"
+import { useLanguage } from "@/lib/language-context";
 
 const collections = [
   {
@@ -27,16 +27,18 @@ const collections = [
     count: 15,
     image: "/vintage-still-life-photography-objects-moody-dark.jpg",
   },
-]
+];
 
 export function CollectionsSection() {
-  const { t } = useLanguage()
+  const { t } = useLanguage();
 
   return (
-    <section id="collections" className="py-24 md:py-32 px-6">
+    <section id="collections" className="py-28 md:py-36 px-6 my-12 md:my-20">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
-          <p className="text-xs tracking-widest text-muted-foreground mb-4 uppercase">{t.collections.subtitle}</p>
+          <p className="text-xs tracking-widest text-muted-foreground mb-4 uppercase">
+            {t.collections.subtitle}
+          </p>
           <h2 className="text-3xl md:text-4xl font-light tracking-tight">
             {t.collections.title1} {t.collections.title2}
           </h2>
@@ -44,7 +46,10 @@ export function CollectionsSection() {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
           {collections.map((collection) => {
-            const name = t.collections.categories[collection.nameKey as keyof typeof t.collections.categories]
+            const name =
+              t.collections.categories[
+                collection.nameKey as keyof typeof t.collections.categories
+              ];
             return (
               <a
                 key={collection.id}
@@ -58,16 +63,18 @@ export function CollectionsSection() {
                 />
                 <div className="absolute inset-0 bg-foreground/30 group-hover:bg-foreground/50 transition-colors duration-300" />
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
-                  <h3 className="text-xl font-light tracking-wide mb-1">{name}</h3>
+                  <h3 className="text-xl font-light tracking-wide mb-1">
+                    {name}
+                  </h3>
                   <p className="text-xs opacity-80">
                     {collection.count} {t.collections.prints}
                   </p>
                 </div>
               </a>
-            )
+            );
           })}
         </div>
       </div>
     </section>
-  )
+  );
 }
