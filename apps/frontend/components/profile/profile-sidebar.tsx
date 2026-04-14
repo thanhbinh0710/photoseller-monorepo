@@ -1,7 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { User, MapPin, Lock, Package, Menu as MenuIcon } from "lucide-react";
+import {
+  User,
+  MapPin,
+  Lock,
+  Package,
+  Menu as MenuIcon,
+  LogOut,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Accordion,
@@ -62,6 +69,12 @@ export function ProfileSidebar({
       label: t.profile.sidebar.myOrders,
       icon: <Package size={18} />,
     },
+    {
+      key: "signOut",
+      label: t.profile.sidebar.signOut,
+      icon: <LogOut size={18} />,
+      isSignOut: true,
+    },
   ];
 
   const handleMenuClick = (key: string) => {
@@ -113,22 +126,24 @@ export function ProfileSidebar({
             <div key={item.key}>
               {item.children ? (
                 <AccordionItem value={item.key}>
-                  <AccordionTrigger className="font-medium ">
+                  <AccordionTrigger className="font-medium py-3">
                     <span className="flex items-center gap-2">
                       {item.icon}
-                      <span className="text-sm">{item.label}</span>
+                      <span className="text-sm text-neutral-400 hover:text-neutral-200 ">
+                        {item.label}
+                      </span>
                     </span>
                   </AccordionTrigger>
-                  <AccordionContent className="pt-1">
-                    <div className="ml-6 space-y-1">
+                  <AccordionContent className="py-1">
+                    <div className="ml-6 space-y-2">
                       {item.children.map((child) => (
                         <button
                           key={child.key}
                           onClick={() => handleMenuClick(child.key)}
                           className={clsx(
-                            "w-full flex items-center gap-2 px-3 py-2 text-sm rounded transition-colors cursor-pointer",
+                            "w-full flex items-center gap-2 px-4 py-3 text-sm rounded transition-colors cursor-pointer text-left",
                             activeTab === child.key
-                              ? "bg-neutral-800 text-secondary-200 "
+                              ? "bg-neutral-800 text-neutral-200"
                               : "text-neutral-400 hover:bg-neutral-800",
                           )}
                         >
@@ -141,12 +156,21 @@ export function ProfileSidebar({
                 </AccordionItem>
               ) : (
                 <button
-                  onClick={() => handleMenuClick(item.key)}
+                  onClick={() => {
+                    if (item.isSignOut) {
+                      localStorage.removeItem("user_logged_in");
+                      window.location.href = "/";
+                    } else {
+                      handleMenuClick(item.key);
+                    }
+                  }}
                   className={clsx(
-                    "w-full flex items-center gap-2 px-3 py-2 text-sm rounded transition-colors cursor-pointer",
-                    activeTab === item.key
-                      ? "bg-neutral-800 text-secondary-200 "
-                      : "text-neutral-400 hover:bg-neutral-800",
+                    "w-full flex items-center gap-2 px-4 py-3 text-sm rounded transition-colors cursor-pointer text-left",
+                    item.isSignOut
+                      ? "text-red-400 hover:bg-red-400/10 font-medium"
+                      : activeTab === item.key
+                        ? "bg-neutral-800 text-neutral-200 "
+                        : "text-neutral-400 hover:bg-neutral-800",
                   )}
                 >
                   {item.icon}

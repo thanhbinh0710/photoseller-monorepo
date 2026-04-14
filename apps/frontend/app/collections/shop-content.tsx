@@ -177,7 +177,7 @@ export default function ShopContent() {
       </div>
 
       {/* Horizontal Filters */}
-      <div className="sticky top-[70px] border-b border-neutral-800 px-4 py-3 bg-primary-950 z-30">
+      <div className="sticky top-[70px] border-b border-primary-900 bg-background/80 backdrop-blur-lg px-4 py-3 z-30">
         <div className="max-w-[1800px] mx-auto">
           <div className="flex flex-wrap gap-6 items-center justify-center">
             {/* Product Count */}

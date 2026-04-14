@@ -7,22 +7,15 @@ import { useState, useEffect, useRef } from "react";
 import {
   Menu,
   X,
-  User,
   ShoppingBag,
   LogOut,
   Package,
-  LogIn,
-  UserPlus,
   ShoppingCart,
+  User,
 } from "lucide-react";
 import { useLanguage } from "@/lib/language-context";
 import { LanguageSwitcher } from "./language-switcher";
 import { Badge } from "@/components/ui/badge";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -31,7 +24,6 @@ gsap.registerPlugin(ScrollTrigger);
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isAccountPopoverOpen, setIsAccountPopoverOpen] = useState(false);
   const [isInHero, setIsInHero] = useState(true);
   const [isNearHeroEnd, setIsNearHeroEnd] = useState(false);
   const { t } = useLanguage();
@@ -82,56 +74,6 @@ export function Header() {
     window.location.href = "/";
   };
 
-  // Account popover content
-  const accountPopoverContent = (
-    <div className="rounded-sm py-1 min-w-[200px]">
-      {isLoggedIn ? (
-        <>
-          <Link
-            href="/profile"
-            className="flex items-center gap-3 px-3 py-2 text-[14px]  text-muted-foreground/40! hover:text-foreground! transition-all duration-300 ease-out uppercase font-sans font-semibold"
-          >
-            <User size={16} className="opacity-70" /> PROFILE
-          </Link>
-          <Link
-            href="/orders"
-            className="flex items-center gap-3 px-3 py-2 text-[14px]  text-muted-foreground/40! hover:text-foreground! transition-all duration-300 ease-out uppercase font-sans font-semibold"
-          >
-            <Package size={16} className="opacity-70" /> ORDERS
-          </Link>
-
-          <div className="bg-foreground/30 my-2 h-px"></div>
-          <div
-            onClick={() => {
-              handleLogout();
-              setIsAccountPopoverOpen(false);
-            }}
-            className="flex items-center gap-3 px-3 py-2 text-[14px]  text-gray-500 hover:text-red-400 transition-colors uppercase w-full cursor-pointer font-semibold"
-          >
-            <LogOut size={16} className="opacity-70" /> LOGOUT
-          </div>
-        </>
-      ) : (
-        <>
-          <Link
-            href="/login"
-            className="flex items-center gap-3 px-3 py-2 text-[14px] tracking-widest text-muted-foreground/40! hover:text-foreground! transition-all duration-300 ease-out uppercase font-sans font-semibold"
-            onClick={() => setIsAccountPopoverOpen(false)}
-          >
-            <LogIn size={16} className="opacity-70" /> SIGN IN
-          </Link>
-          <Link
-            href="/register"
-            className="flex items-center gap-3 px-3 py-2 text-[14px]  text-muted-foreground/40! hover:text-foreground! transition-all duration-300 ease-out uppercase font-sans font-semibold"
-            onClick={() => setIsAccountPopoverOpen(false)}
-          >
-            <UserPlus size={16} className="opacity-70" /> REGISTER
-          </Link>
-        </>
-      )}
-    </div>
-  );
-
   return (
     <div
       className={`fixed top-0 left-0 right-0 z-50 flex items-center h-[70px] transition-all duration-300 ${
@@ -139,7 +81,7 @@ export function Header() {
           ? "bg-transparent border-b border-transparent"
           : isNearHeroEnd
             ? "bg-transparent border-b border-transparent"
-            : "border-b border-primary-600 bg-primary-950"
+            : "border-b border-primary-900 bg-background/80 backdrop-blur-lg"
       }`}
     >
       <div className="max-w-[1800px] mx-auto px-3 w-full h-full flex items-center">
@@ -155,83 +97,85 @@ export function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-10">
+          <div className="hidden md:flex items-center gap-10 font-normal">
             <Link
               href="/collections"
-              className={`text-base transition-all duration-300 ease-out cursor-pointer ${
+              className={`text-base transition-all duration-300 ease-out cursor-pointer group ${
                 pathname === "/collections"
                   ? "text-foreground"
                   : "text-foreground"
               }`}
             >
-              <span
-                className={`inline-block transition-all duration-300 ease-out pb-1 ${
-                  pathname === "/collections"
-                    ? "border-b-2 border-foreground"
-                    : "border-b-2 border-transparent hover:border-foreground"
-                }`}
-              >
+              <span className="inline-flex items-center gap-2">
+                <span
+                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                    pathname === "/collections"
+                      ? "bg-foreground"
+                      : "bg-transparent group-hover:bg-foreground"
+                  }`}
+                />
                 {t.nav.collections}
               </span>
             </Link>
 
             <Link
               href="/about"
-              className={`text-base transition-all duration-300 ease-out cursor-pointer ${
+              className={`text-base transition-all duration-300 ease-out cursor-pointer group ${
                 pathname === "/about" ? "text-foreground" : "text-foreground"
               }`}
             >
-              <span
-                className={`inline-block transition-all duration-300 ease-out pb-1 ${
-                  pathname === "/about"
-                    ? "border-b-2 border-foreground"
-                    : "border-b-2 border-transparent hover:border-foreground"
-                }`}
-              >
+              <span className="inline-flex items-center gap-2">
+                <span
+                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                    pathname === "/about"
+                      ? "bg-foreground"
+                      : "bg-transparent group-hover:bg-foreground"
+                  }`}
+                />
                 {t.nav.about}
               </span>
             </Link>
             <Link
               href="#contact"
-              className="text-base text-foreground transition-all duration-300 ease-out cursor-pointer"
+              className="text-base text-foreground transition-all duration-300 ease-out cursor-pointer group"
             >
-              <span className="inline-block transition-all duration-300 ease-out pb-1 border-b-2 border-transparent hover:border-foreground">
+              <span className="inline-flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-transparent group-hover:bg-foreground transition-all duration-300" />
                 {t.nav.contact}
               </span>
             </Link>
           </div>
 
           <div className="hidden md:flex items-center gap-6">
-            <Popover
-              open={isAccountPopoverOpen}
-              onOpenChange={setIsAccountPopoverOpen}
-            >
-              <PopoverTrigger asChild>
-                <button className="text-foreground hover:text-foreground/80 transition-colors cursor-pointer">
-                  <User size={20} />
-                </button>
-              </PopoverTrigger>
-              <PopoverContent
-                align="end"
-                side="bottom"
-                sideOffset={20}
-                className="w-56"
-              >
-                {accountPopoverContent}
-              </PopoverContent>
-            </Popover>
-
-            <button className="text-foreground hover:text-foreground/80 transition-colors cursor-pointer relative">
-              {0 > 0 && (
-                <Badge
-                  variant="destructive"
-                  className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0"
+            {isLoggedIn ? (
+              <>
+                <Link
+                  href="/profile"
+                  className="text-foreground hover:text-foreground/80 transition-colors cursor-pointer"
+                  title="Profile"
                 >
-                  {0}
-                </Badge>
-              )}
-              <ShoppingCart size={20} />
-            </button>
+                  <User size={20} />
+                </Link>
+                <button className="text-foreground hover:text-foreground/80 transition-colors cursor-pointer relative">
+                  {0 > 0 && (
+                    <Badge
+                      variant="destructive"
+                      className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0"
+                    >
+                      {0}
+                    </Badge>
+                  )}
+                  <ShoppingCart size={20} />
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/login"
+                className="text-foreground hover:text-foreground/80 transition-colors cursor-pointer text-sm font-medium"
+              >
+                SIGN IN
+              </Link>
+            )}
 
             <LanguageSwitcher />
           </div>
@@ -251,20 +195,21 @@ export function Header() {
             <div className="flex flex-col gap-4">
               <Link
                 href="/shop"
-                className={`text-base transition-all duration-300 ease-out py-2 ${
+                className={`text-base transition-all duration-300 ease-out py-2 group ${
                   pathname === "/shop" || pathname === "/collections"
                     ? "text-foreground"
                     : "text-foreground"
                 }`}
                 onClick={() => setIsMenuOpen(false)}
               >
-                <span
-                  className={`inline-block transition-all duration-300 ease-out pb-1 ${
-                    pathname === "/shop" || pathname === "/collections"
-                      ? "border-b-2 border-foreground"
-                      : "border-b-2 border-transparent hover:border-foreground"
-                  }`}
-                >
+                <span className="inline-flex items-center gap-2">
+                  <span
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                      pathname === "/shop" || pathname === "/collections"
+                        ? "bg-foreground"
+                        : "bg-transparent group-hover:bg-foreground"
+                    }`}
+                  />
                   {t.nav.collections}
                 </span>
               </Link>
@@ -295,63 +240,64 @@ export function Header() {
 
               <Link
                 href="/about"
-                className={`text-base transition-all duration-300 ease-out py-2 ${
+                className={`text-base transition-all duration-300 ease-out py-2 group ${
                   pathname === "/about" ? "text-foreground" : "text-foreground"
                 }`}
                 onClick={() => setIsMenuOpen(false)}
               >
-                <span
-                  className={`inline-block transition-all duration-300 ease-out pb-1 ${
-                    pathname === "/about"
-                      ? "border-b-2 border-foreground"
-                      : "border-b-2 border-transparent hover:border-foreground"
-                  }`}
-                >
+                <span className="inline-flex items-center gap-2">
+                  <span
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                      pathname === "/about"
+                        ? "bg-foreground"
+                        : "bg-transparent group-hover:bg-foreground"
+                    }`}
+                  />
                   {t.nav.about}
                 </span>
               </Link>
               <Link
                 href="#contact"
-                className="text-base text-foreground transition-all duration-300 ease-out py-2"
+                className="text-base text-foreground transition-all duration-300 ease-out py-2 group"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <span className="inline-block transition-all duration-300 ease-out pb-1 border-b-2 border-transparent hover:border-foreground">
+                <span className="inline-flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-transparent group-hover:bg-foreground transition-all duration-300" />
                   {t.nav.contact}
                 </span>
               </Link>
 
               <div className="pt-4 space-y-4 border-t border-primary-600">
                 <div className="flex items-center gap-4">
-                  <Popover
-                    open={isAccountPopoverOpen}
-                    onOpenChange={setIsAccountPopoverOpen}
-                  >
-                    <PopoverTrigger asChild>
-                      <button className="text-foreground hover:text-foreground/70 transition-colors">
-                        <User size={20} />
-                      </button>
-                    </PopoverTrigger>
-                    <PopoverContent
-                      align="end"
-                      side="bottom"
-                      sideOffset={8}
-                      className="w-56"
-                    >
-                      {accountPopoverContent}
-                    </PopoverContent>
-                  </Popover>
-
-                  <button className="text-foreground hover:text-foreground/70 transition-colors relative">
-                    {0 > 0 && (
-                      <Badge
-                        variant="destructive"
-                        className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0"
+                  {isLoggedIn ? (
+                    <>
+                      <Link
+                        href="/profile"
+                        className="text-foreground hover:text-foreground/70 transition-colors"
                       >
-                        {0}
-                      </Badge>
-                    )}
-                    <ShoppingCart size={20} />
-                  </button>
+                        <ShoppingBag size={20} />
+                      </Link>
+                      <button className="text-foreground hover:text-foreground/70 transition-colors relative">
+                        {0 > 0 && (
+                          <Badge
+                            variant="destructive"
+                            className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0"
+                          >
+                            {0}
+                          </Badge>
+                        )}
+                        <ShoppingCart size={20} />
+                      </button>
+                    </>
+                  ) : (
+                    <Link
+                      href="/login"
+                      className="text-foreground hover:text-foreground/70 transition-colors text-sm font-medium"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      SIGN IN
+                    </Link>
+                  )}
                   <LanguageSwitcher />
                 </div>
               </div>

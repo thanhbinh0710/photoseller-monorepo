@@ -8,7 +8,7 @@ export const translations = {
     nav: {
       collections: "COLLECTIONS",
       about: "ABOUT",
-      contact: "CONTACT",
+      contact: "CONTACT US",
     },
     // Hero
     hero: {
@@ -189,11 +189,12 @@ export const translations = {
     // Profile
     profile: {
       sidebar: {
-        accountInfo: "Account Information",
-        personalProfile: "Personal Profile",
+        accountInfo: "Account Overview",
+        personalProfile: "Profile Information",
         addressBook: "Address Book",
         changePassword: "Change Password",
         myOrders: "My Orders",
+        signOut: "Sign Out",
       },
       accountInfo: {
         title: "Profile Information",
