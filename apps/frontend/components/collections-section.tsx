@@ -1,6 +1,12 @@
 "use client";
 
+import { useRef } from "react";
 import { useLanguage } from "@/lib/language-context";
+import { useGSAP } from "@gsap/react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const collections = [
   {
@@ -31,9 +37,33 @@ const collections = [
 
 export function CollectionsSection() {
   const { t } = useLanguage();
+  const sectionRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(
+    () => {
+      // Animate collection cards on scroll
+      gsap.from(".collection-card", {
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 80%",
+          toggleActions: "play none none none",
+        },
+        y: 60,
+        opacity: 0,
+        duration: 1,
+        stagger: 0.15,
+        ease: "power3.out",
+      });
+    },
+    { scope: sectionRef },
+  );
 
   return (
-    <section id="collections" className="py-28 md:py-36 px-6 my-12 md:my-20">
+    <section
+      ref={sectionRef}
+      id="collections"
+      className="py-28 md:py-36 px-6 my-12 md:my-20"
+    >
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <p className="text-xs tracking-widest text-muted-foreground mb-4 uppercase">
@@ -54,7 +84,7 @@ export function CollectionsSection() {
               <a
                 key={collection.id}
                 href={`#${collection.nameKey.toLowerCase()}`}
-                className="group relative aspect-[4/5] overflow-hidden"
+                className="collection-card group relative aspect-[4/5] overflow-hidden"
               >
                 <img
                   src={collection.image || "/placeholder.svg"}

@@ -5,6 +5,11 @@ import { ChevronDown, Heart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useLanguage } from "@/lib/language-context";
+import { useGSAP } from "@gsap/react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const products = [
   {
@@ -94,6 +99,7 @@ const colors = [
 export default function ShopContent() {
   const { t } = useLanguage();
   const [sortOpen, setSortOpen] = useState(false);
+  const gridRef = useRef<HTMLDivElement>(null);
   const [selectedFilters, setSelectedFilters] = useState<{
     collections: string[];
     colorTone: string[];
@@ -107,6 +113,25 @@ export default function ShopContent() {
   });
   const [priceRange, setPriceRange] = useState([20, 500]);
   const sortRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(
+    () => {
+      // Animate product grid items on scroll
+      gsap.from(".product-item", {
+        scrollTrigger: {
+          trigger: gridRef.current,
+          start: "top 80%",
+          toggleActions: "play none none none",
+        },
+        y: 60,
+        opacity: 0,
+        duration: 0.8,
+        stagger: 0.08,
+        ease: "power3.out",
+      });
+    },
+    { scope: gridRef },
+  );
 
   const collections = [
     "All Collections",
@@ -163,7 +188,7 @@ export default function ShopContent() {
   };
 
   return (
-    <div className="min-h-screen bg-background pt-[70px]">
+    <div className="min-h-screen bg-background">
       {/* Header Section */}
       <div className="border-b border-neutral-800 px-4 py-12 md:py-16">
         <div className="max-w-[1800px] mx-auto text-center">
@@ -315,11 +340,14 @@ export default function ShopContent() {
 
       {/* Main Content - Full Width Grid */}
       <div className="max-w-[1800px] mx-auto px-4 py-12">
-        <div>
+        <div ref={gridRef}>
           {/* Product Grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-32">
             {products.map((product) => (
-              <div key={product.id} className="group cursor-pointer">
+              <div
+                key={product.id}
+                className="product-item group cursor-pointer"
+              >
                 <Link href={`/products/${product.id}`} className="block">
                   {/* Product Image with Hover Heart */}
                   <div className="relative aspect-[3/4] overflow-hidden bg-neutral-900 mb-4 group">

@@ -14,7 +14,7 @@ import {
 export function CollectionsDropdown() {
   const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
-  const closeTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const closeTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const handleMouseEnter = () => {
     if (closeTimeoutRef.current) {

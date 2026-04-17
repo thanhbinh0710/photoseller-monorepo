@@ -191,7 +191,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-950 pt-[70px] text-white">
+    <div className="min-h-screen bg-neutral-950 text-white">
       {/* Breadcrumb */}
       <div className="px-4 py-3 ml-12 border-b border-neutral-800">
         <div className="flex items-center gap-2 text-xs text-neutral-400">
