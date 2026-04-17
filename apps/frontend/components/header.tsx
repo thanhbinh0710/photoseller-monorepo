@@ -18,6 +18,7 @@ import { LanguageSwitcher } from "./language-switcher";
 import { Badge } from "@/components/ui/badge";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -28,45 +29,47 @@ export function Header() {
   const [isNearHeroEnd, setIsNearHeroEnd] = useState(false);
   const { t } = useLanguage();
   const pathname = usePathname();
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const status = localStorage.getItem("user_logged_in");
     setIsLoggedIn(status === "true");
   }, []);
 
-  useEffect(() => {
-    // Only enable transparent header on home page
-    if (pathname !== "/") {
-      setIsInHero(false);
-      setIsNearHeroEnd(false);
-      return;
-    }
-
-    const handleScroll = () => {
-      // Hero section is min-h-screen, so we check if scroll position is less than viewport height
-      const heroHeight = window.innerHeight;
-      const scrollRatio = window.scrollY / heroHeight;
-
-      // isNearHeroEnd: when we're at 60-100% through the hero
-      if (scrollRatio > 0.6 && scrollRatio < 1) {
-        setIsInHero(false);
-        setIsNearHeroEnd(true);
-      }
-      // isInHero: when we're at the beginning (0-60% through the hero)
-      else if (scrollRatio < 0.6) {
-        setIsInHero(true);
-        setIsNearHeroEnd(false);
-      }
-      // Left hero completely
-      else {
+  useGSAP(
+    () => {
+      // Only enable scroll tracking on home page
+      if (pathname !== "/") {
         setIsInHero(false);
         setIsNearHeroEnd(false);
+        return;
       }
-    };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [pathname]);
+      // Create a scroll tracker for the hero section
+      gsap.to(".hero-scroll-tracker", {
+        scrollTrigger: {
+          trigger: document.documentElement,
+          onUpdate: (self) => {
+            const heroHeight = window.innerHeight;
+            const scrollRatio = self.progress * window.innerHeight;
+            const scrollPercent = scrollRatio / heroHeight;
+
+            if (scrollPercent > 0.6 && scrollPercent < 1) {
+              setIsInHero(false);
+              setIsNearHeroEnd(true);
+            } else if (scrollPercent < 0.6) {
+              setIsInHero(true);
+              setIsNearHeroEnd(false);
+            } else {
+              setIsInHero(false);
+              setIsNearHeroEnd(false);
+            }
+          },
+        },
+      });
+    },
+    { scope: containerRef, dependencies: [pathname] },
+  );
 
   const handleLogout = () => {
     localStorage.removeItem("user_logged_in");
@@ -76,13 +79,8 @@ export function Header() {
 
   return (
     <div
-      className={`fixed top-0 left-0 right-0 z-50 flex items-center h-[70px] transition-all duration-300 ${
-        isInHero
-          ? "bg-transparent border-b border-transparent"
-          : isNearHeroEnd
-            ? "bg-transparent border-b border-transparent"
-            : "border-b border-primary-900 bg-background/80 backdrop-blur-lg"
-      }`}
+      ref={containerRef}
+      className="hero-scroll-tracker sticky top-0 left-0 right-0 z-50 flex items-center h-[70px] bg-background "
     >
       <div className="max-w-[1800px] mx-auto px-3 w-full h-full flex items-center">
         <nav className="flex items-center justify-between font-semibold w-full">
@@ -97,52 +95,25 @@ export function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-10 font-normal">
+          <div className="hidden md:flex items-center gap-10 font-bold">
             <Link
               href="/collections"
-              className={`text-base transition-all duration-300 ease-out cursor-pointer group ${
-                pathname === "/collections"
-                  ? "text-foreground"
-                  : "text-foreground"
-              }`}
+              className="text-base text-foreground transition-all duration-300 ease-out cursor-pointer hover:text-secondary"
             >
-              <span className="inline-flex items-center gap-2">
-                <span
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                    pathname === "/collections"
-                      ? "bg-foreground"
-                      : "bg-transparent group-hover:bg-foreground"
-                  }`}
-                />
-                {t.nav.collections}
-              </span>
+              {t.nav.collections}
             </Link>
 
             <Link
               href="/about"
-              className={`text-base transition-all duration-300 ease-out cursor-pointer group ${
-                pathname === "/about" ? "text-foreground" : "text-foreground"
-              }`}
+              className="text-base text-foreground transition-all duration-300 ease-out cursor-pointer hover:text-secondary"
             >
-              <span className="inline-flex items-center gap-2">
-                <span
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                    pathname === "/about"
-                      ? "bg-foreground"
-                      : "bg-transparent group-hover:bg-foreground"
-                  }`}
-                />
-                {t.nav.about}
-              </span>
+              {t.nav.about}
             </Link>
             <Link
               href="#contact"
-              className="text-base text-foreground transition-all duration-300 ease-out cursor-pointer group"
+              className="text-base text-foreground transition-all duration-300 ease-out cursor-pointer hover:text-secondary"
             >
-              <span className="inline-flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-transparent group-hover:bg-foreground transition-all duration-300" />
-                {t.nav.contact}
-              </span>
+              {t.nav.contact}
             </Link>
           </div>
 
@@ -195,23 +166,10 @@ export function Header() {
             <div className="flex flex-col gap-4">
               <Link
                 href="/shop"
-                className={`text-base transition-all duration-300 ease-out py-2 group ${
-                  pathname === "/shop" || pathname === "/collections"
-                    ? "text-foreground"
-                    : "text-foreground"
-                }`}
+                className="text-base text-foreground transition-all duration-300 ease-out py-2 hover:text-secondary"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <span className="inline-flex items-center gap-2">
-                  <span
-                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                      pathname === "/shop" || pathname === "/collections"
-                        ? "bg-foreground"
-                        : "bg-transparent group-hover:bg-foreground"
-                    }`}
-                  />
-                  {t.nav.collections}
-                </span>
+                {t.nav.collections}
               </Link>
 
               <div className="pl-4 space-y-2">
@@ -240,31 +198,17 @@ export function Header() {
 
               <Link
                 href="/about"
-                className={`text-base transition-all duration-300 ease-out py-2 group ${
-                  pathname === "/about" ? "text-foreground" : "text-foreground"
-                }`}
+                className="text-base text-foreground transition-all duration-300 ease-out py-2 hover:text-secondary"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <span className="inline-flex items-center gap-2">
-                  <span
-                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                      pathname === "/about"
-                        ? "bg-foreground"
-                        : "bg-transparent group-hover:bg-foreground"
-                    }`}
-                  />
-                  {t.nav.about}
-                </span>
+                {t.nav.about}
               </Link>
               <Link
                 href="#contact"
-                className="text-base text-foreground transition-all duration-300 ease-out py-2 group"
+                className="text-base text-foreground transition-all duration-300 ease-out py-2 hover:text-secondary"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <span className="inline-flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-transparent group-hover:bg-foreground transition-all duration-300" />
-                  {t.nav.contact}
-                </span>
+                {t.nav.contact}
               </Link>
 
               <div className="pt-4 space-y-4 border-t border-primary-600">

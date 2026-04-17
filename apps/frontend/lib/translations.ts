@@ -12,8 +12,9 @@ export const translations = {
     },
     // Hero
     hero: {
-      title1: "Gathering the Fragments of",
-      title2: "A Lifetime",
+      titleBefore: "Gathering the ",
+      titleHighlight: "Fragments",
+      titleAfter: "of a\nLifetime",
       description:
         "Where I condense the beauty of every moment into photographs.",
       cta: "EXPLORE COLLECTION",
@@ -23,7 +24,7 @@ export const translations = {
       sectionTitle: "Gallery",
       subtitle: "CURATED SELECTION",
       title1: "Featured",
-      title2: "Works",
+      title2: "Works.",
       viewDetails: "VIEW DETAILS",
     },
     // About
@@ -315,10 +316,11 @@ export const translations = {
     },
     // Hero
     hero: {
-      title1: "Gom Nhặt Từng Phút Giây",
-      title2: "Bên Đời",
+      titleBefore: "Gom Nhặt Từng ",
+      titleHighlight: "Phút Giây",
+      titleAfter: "Bên Đời",
       description:
-        "Nơi tôi cô đọng vẻ đẹp của từng khoảng khắc vào những bức hình.",
+        "Nơi tôi cô đọng vẻ đẽp của từng khoảng khắc vào những bức hình.",
       cta: "KHÁM PHÁ NGAY",
     },
     // Featured Gallery
@@ -326,7 +328,7 @@ export const translations = {
       sectionTitle: "Bộ sưu tập",
       subtitle: "TUYỂN CHỌN ĐẶC BIỆT",
       title1: "Tác Phẩm",
-      title2: "Nổi Bật",
+      title2: "Nổi Bật.",
       viewDetails: "XEM CHI TIẾT",
     },
     // About
@@ -499,6 +501,7 @@ export const translations = {
         addressBook: "Sổ địa chỉ",
         changePassword: "Đổi mật khẩu",
         myOrders: "Đơn hàng của tôi",
+        signOut: "Đăng xuất",
       },
       accountInfo: {
         title: "Thông tin hồ sơ",
@@ -517,10 +520,13 @@ export const translations = {
         title: "Sổ địa chỉ",
         addNew: "Thêm địa chỉ mới",
         addressName: "Tên địa chỉ",
+        addressNamePlaceholder: "Ví dụ: Nhà, Văn phòng...",
         phoneNumber: "Số điện thoại",
+        phoneNumberPlaceholder: "090xxx",
         address: "Địa chỉ",
         city: "Thành phố",
         district: "Quận/Huyện",
+        street: "Đường/Phố",
         ward: "Phường/Xã",
         setDefault: "Đặt làm mặc định",
         edit: "Chỉnh sửa",
@@ -551,6 +557,7 @@ export const translations = {
         submitButton: "Cập nhật mật khẩu",
         successMessage: "Mật khẩu đã được cập nhật thành công!",
         errorMessage: "Lỗi khi cập nhật mật khẩu",
+        passwordRequirements: "Yêu cầu mật khẩu",
         cancel: "Hủy",
         updating: "Đang cập nhật...",
         requirementMin: "Ít nhất 8 ký tự",
