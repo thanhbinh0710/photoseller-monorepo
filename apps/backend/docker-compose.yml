@@ -6,7 +6,7 @@ services:
     container_name: photoseller-be-app
     restart: unless-stopped
     ports:
-      - '8000:8000'
+      - '8001:8000'
     environment:
       - NODE_ENV=development
       - DATABASE_URL=mysql://photoseller:photoseller@mariadb:3306/photoseller
