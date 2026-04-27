@@ -23,8 +23,9 @@ services:
     networks:
       - photoseller_network
     depends_on:
-      - mariadb
-    command: pnpm run start:dev
+      mariadb:
+        condition: service_healthy
+    command: sh -c "pnpm run prisma:migrate:deploy && pnpm run start:dev"
 
   mariadb:
     image: mariadb:11
@@ -42,6 +43,11 @@ services:
       - ./docker/mariadb/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     networks:
       - photoseller_network
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
