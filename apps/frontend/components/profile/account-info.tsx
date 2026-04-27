@@ -30,7 +30,7 @@ export function AccountInfo({ onRefresh }: AccountInfoDisplayProps) {
           : {
               phoneNumber: userProfile.telephones[0].phoneNumber,
               id: userProfile.telephones[0].id,
-            }
+            },
       );
     }
   }, [userProfile]);
@@ -84,9 +84,7 @@ export function AccountInfo({ onRefresh }: AccountInfoDisplayProps) {
             <label className="block text-sm font-medium text-neutral-400 mb-1">
               {t.profile.accountInfo.lastNameLabel}
             </label>
-            <p className="text-white text-lg">
-              {userProfile?.lastName || "—"}
-            </p>
+            <p className="text-white text-lg">{userProfile?.lastName || "—"}</p>
           </div>
 
           {/* Phone */}

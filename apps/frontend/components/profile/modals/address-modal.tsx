@@ -125,14 +125,12 @@ export function AddressModal({
       toast.success(
         isEditMode
           ? "Address updated successfully"
-          : "Address added successfully"
+          : "Address added successfully",
       );
       onOpenChange(false);
       onSuccess?.();
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "An error occurred"
-      );
+      toast.error(error instanceof Error ? error.message : "An error occurred");
     } finally {
       setIsLoading(false);
     }

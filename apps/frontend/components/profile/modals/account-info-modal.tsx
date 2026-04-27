@@ -136,14 +136,16 @@ export function AccountInfoModal({
         }
       }
 
-      toast.success(t.profile.accountInfo.successMessage || "Updated successfully");
+      toast.success(
+        t.profile.accountInfo.successMessage || "Updated successfully",
+      );
       onOpenChange(false);
       onSuccess?.();
     } catch (error) {
       toast.error(
         error instanceof Error
           ? error.message
-          : t.profile.accountInfo.errorMessage || "An error occurred"
+          : t.profile.accountInfo.errorMessage || "An error occurred",
       );
     } finally {
       setIsLoading(false);
@@ -154,7 +156,9 @@ export function AccountInfoModal({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>{t.profile.accountInfo.editTitle || "Edit Account Information"}</DialogTitle>
+          <DialogTitle>
+            {t.profile.accountInfo.editTitle || "Edit Account Information"}
+          </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -222,7 +226,9 @@ export function AccountInfoModal({
                   phone: e.target.value,
                 }))
               }
-              placeholder={t.profile.accountInfo.phonePlaceholder || "+84901234567"}
+              placeholder={
+                t.profile.accountInfo.phonePlaceholder || "+84901234567"
+              }
               disabled={isLoading}
               className={`bg-neutral-800 border-neutral-700 text-white placeholder-neutral-500 ${
                 errors.phone ? "border-red-500" : ""
@@ -247,7 +253,9 @@ export function AccountInfoModal({
             disabled={isLoading}
             className="bg-blue-600 hover:bg-blue-700"
           >
-            {isLoading ? (t.common.saving || "Saving...") : (t.common.save || "Save")}
+            {isLoading
+              ? t.common.saving || "Saving..."
+              : t.common.save || "Save"}
           </Button>
         </DialogFooter>
       </DialogContent>

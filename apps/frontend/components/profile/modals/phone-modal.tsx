@@ -99,7 +99,7 @@ export function PhoneModal({
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
 
         if (!primaryResponse.ok) {
@@ -111,14 +111,12 @@ export function PhoneModal({
       toast.success(
         isEditMode
           ? "Phone number updated successfully"
-          : "Phone number added successfully"
+          : "Phone number added successfully",
       );
       onOpenChange(false);
       onSuccess?.();
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "An error occurred"
-      );
+      toast.error(error instanceof Error ? error.message : "An error occurred");
     } finally {
       setIsLoading(false);
     }

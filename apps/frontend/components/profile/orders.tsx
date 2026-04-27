@@ -66,13 +66,16 @@ export function Orders({ onRefresh }: OrdersProps) {
         throw new Error("No authentication token found");
       }
 
-      const response = await fetch(`${API_BASE_URL}/user/orders?page=1&limit=10`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        `${API_BASE_URL}/user/orders?page=1&limit=10`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -83,7 +86,9 @@ export function Orders({ onRefresh }: OrdersProps) {
       setOrders(data.data?.orders || []);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "An error occurred while fetching orders"
+        err instanceof Error
+          ? err.message
+          : "An error occurred while fetching orders",
       );
       setOrders([]);
     } finally {
@@ -211,8 +216,7 @@ export function Orders({ onRefresh }: OrdersProps) {
                       {t.profile.orders.quantity || "Items"}
                     </p>
                     <p className="font-medium text-neutral-100">
-                      {order.items.length}{" "}
-                      {t.profile.orders.items || "item(s)"}
+                      {order.items.length} {t.profile.orders.items || "item(s)"}
                     </p>
                   </div>
                   <div>
