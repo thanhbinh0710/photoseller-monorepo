@@ -3,8 +3,7 @@ import type { Metadata, Viewport } from "next";
 import { Roboto, Geist_Mono, Newsreader } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { LanguageProvider } from "@/lib/language-context";
-import { Header } from "@/components/header";
-import { SmoothScrollWrapper } from "@/components/smooth-scroll-wrapper";
+import { LayoutWrapper } from "@/components/layout-wrapper";
 import "./globals.css";
 
 const newsreader = Newsreader({
@@ -41,8 +40,7 @@ export default function RootLayout({
     <html lang="vi" className={`${roboto.variable} ${newsreader.variable}`}>
       <body suppressHydrationWarning>
         <LanguageProvider>
-          <Header />
-          <SmoothScrollWrapper>{children}</SmoothScrollWrapper>
+          <LayoutWrapper>{children}</LayoutWrapper>
           <Analytics />
         </LanguageProvider>
       </body>

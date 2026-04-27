@@ -423,4 +423,51 @@ export class UserService {
       data: updated,
     };
   }
+
+  // Order methods
+  async getOrders(userId: number, page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+
+    const [orders, total] = await Promise.all([
+      this.prisma.order.findMany({
+        where: { userId },
+        include: {
+          items: {
+            include: {
+              photo: {
+                select: {
+                  id: true,
+                  name: true,
+                  slug: true,
+                  imageUrl: true,
+                  price: true,
+                },
+              },
+            },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.order.count({
+        where: { userId },
+      }),
+    ]);
+
+    return {
+      statusCode: 200,
+      success: true,
+      message: 'Orders retrieved successfully',
+      data: {
+        orders,
+        pagination: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+        },
+      },
+    };
+  }
 }

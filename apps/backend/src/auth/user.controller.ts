@@ -11,6 +11,7 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -340,5 +341,66 @@ export class UserController {
     @Param('id', ParseIntPipe) id: number,
   ) {
     return this.userService.setPrimaryAddress(user.sub, id);
+  }
+
+  // Order endpoints
+  @Get('orders')
+  @ApiOperation({
+    summary: 'Get user orders',
+    description: 'Get paginated list of user orders with items',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Orders retrieved successfully',
+    schema: {
+      example: {
+        statusCode: 200,
+        success: true,
+        message: 'Orders retrieved successfully',
+        data: {
+          orders: [
+            {
+              id: 1,
+              orderNumber: 'ORD-001',
+              customerName: 'John Doe',
+              customerEmail: 'john@example.com',
+              customerPhone: '+84901234567',
+              totalAmount: '250.00',
+              status: 'COMPLETED',
+              paymentStatus: 'PAID',
+              createdAt: '2026-04-06T10:00:00.000Z',
+              items: [
+                {
+                  id: 1,
+                  quantity: 2,
+                  price: '125.00',
+                  photo: {
+                    id: 1,
+                    name: 'Photo 1',
+                    slug: 'photo-1',
+                    imageUrl: 'https://...',
+                    price: '125.00',
+                  },
+                },
+              ],
+            },
+          ],
+          pagination: {
+            total: 10,
+            page: 1,
+            limit: 10,
+            totalPages: 1,
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getOrders(
+    @CurrentUser() user: any,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ) {
+    return this.userService.getOrders(user.sub, page || 1, limit || 10);
   }
 }

@@ -25,11 +25,11 @@ export function SmoothScrollWrapper({ children }: SmoothScrollWrapperProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
 
-  // Disable smooth scroll on auth pages
+  // Disable smooth scroll on auth pages and dashboard
   const isAuthPage =
     pathname === "/login" ||
     pathname === "/register" ||
-    pathname === "/profile";
+    pathname.startsWith("/dashboard");
 
   useGSAP(
     () => {

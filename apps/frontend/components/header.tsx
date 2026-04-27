@@ -15,7 +15,9 @@ import {
 } from "lucide-react";
 import { useLanguage } from "@/lib/language-context";
 import { LanguageSwitcher } from "./language-switcher";
+import { AccountMenu } from "./account-menu";
 import { Badge } from "@/components/ui/badge";
+import { useFetchUserProfile } from "@/lib/hooks/useFetchUserProfile";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -28,6 +30,7 @@ export function Header() {
   const [isInHero, setIsInHero] = useState(true);
   const [isNearHeroEnd, setIsNearHeroEnd] = useState(false);
   const { t } = useLanguage();
+  const { rawUserProfile } = useFetchUserProfile();
   const pathname = usePathname();
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -77,6 +80,11 @@ export function Header() {
     window.location.href = "/";
   };
 
+  // Do not render the header on auth pages
+  if (pathname === "/login" || pathname === "/signup") {
+    return null;
+  }
+
   return (
     <div
       ref={containerRef}
@@ -120,13 +128,7 @@ export function Header() {
           <div className="hidden md:flex items-center gap-6">
             {isLoggedIn ? (
               <>
-                <Link
-                  href="/profile"
-                  className="text-foreground hover:text-foreground/80 transition-colors cursor-pointer"
-                  title="Profile"
-                >
-                  <User size={20} />
-                </Link>
+                <AccountMenu />
                 <button className="text-foreground hover:text-foreground/80 transition-colors cursor-pointer relative">
                   {0 > 0 && (
                     <Badge
@@ -140,12 +142,14 @@ export function Header() {
                 </button>
               </>
             ) : (
-              <Link
-                href="/login"
-                className="text-foreground hover:text-foreground/80 transition-colors cursor-pointer text-sm font-medium"
-              >
-                SIGN IN
-              </Link>
+              <>
+                <Link
+                  href="/login"
+                  className="text-foreground hover:text-foreground/80 transition-colors cursor-pointer text-sm font-medium"
+                >
+                  ACCOUNT
+                </Link>
+              </>
             )}
 
             <LanguageSwitcher />
@@ -211,16 +215,51 @@ export function Header() {
                 {t.nav.contact}
               </Link>
 
+              {isLoggedIn && (
+                <div className="pt-4 space-y-2 border-t border-primary-600">
+                  <p className="text-sm text-muted-foreground font-semibold">
+                    Account
+                  </p>
+                  {/* Admin Dashboard Link */}
+                  {rawUserProfile?.role === "ADMIN" && (
+                    <Link
+                      href="/dashboard/account"
+                      className="block text-base text-foreground transition-all duration-300 ease-out py-2 hover:text-secondary"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Dashboard
+                    </Link>
+                  )}
+                  <Link
+                    href="/account/order"
+                    className="block text-base text-foreground transition-all duration-300 ease-out py-2 hover:text-secondary"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Orders
+                  </Link>
+                  <Link
+                    href="/account/profile"
+                    className="block text-base text-foreground transition-all duration-300 ease-out py-2 hover:text-secondary"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Profile
+                  </Link>
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setIsMenuOpen(false);
+                    }}
+                    className="block text-base text-destructive transition-all duration-300 ease-out py-2 hover:text-red-400"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              )}
+
               <div className="pt-4 space-y-4 border-t border-primary-600">
                 <div className="flex items-center gap-4">
                   {isLoggedIn ? (
                     <>
-                      <Link
-                        href="/profile"
-                        className="text-foreground hover:text-foreground/70 transition-colors"
-                      >
-                        <ShoppingBag size={20} />
-                      </Link>
                       <button className="text-foreground hover:text-foreground/70 transition-colors relative">
                         {0 > 0 && (
                           <Badge
@@ -234,13 +273,22 @@ export function Header() {
                       </button>
                     </>
                   ) : (
-                    <Link
-                      href="/login"
-                      className="text-foreground hover:text-foreground/70 transition-colors text-sm font-medium"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      SIGN IN
-                    </Link>
+                    <>
+                      <Link
+                        href="/login"
+                        className="text-foreground hover:text-foreground/70 transition-colors text-sm font-medium"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        SIGN IN
+                      </Link>
+                      <Link
+                        href="/signup"
+                        className="text-foreground hover:text-foreground/70 transition-colors text-sm font-medium"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        SIGN UP
+                      </Link>
+                    </>
                   )}
                   <LanguageSwitcher />
                 </div>

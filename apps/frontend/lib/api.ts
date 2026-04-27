@@ -5,7 +5,8 @@
  * Base URL is configured from environment variables.
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+export const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://103.172.78.8:8002";
 
 interface ApiResponse<T = any> {
   statusCode: number;
