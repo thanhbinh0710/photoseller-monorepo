@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { API_BASE_URL } from "@/lib/api";
 
 export interface UserProfile {
   firstName: string;
@@ -37,7 +38,7 @@ export function useFetchUserProfile() {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await fetch("http://localhost:8000/user/profile", {
+      const response = await fetch(`${API_BASE_URL}/user/profile`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
         },
@@ -73,5 +74,11 @@ export function useFetchUserProfile() {
     fetchUserData();
   }, []);
 
-  return { userProfile, isLoading, error, refetch: fetchUserData };
+  return {
+    userProfile,
+    rawUserProfile,
+    isLoading,
+    error,
+    refetch: fetchUserData,
+  };
 }
